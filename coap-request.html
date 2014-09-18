@@ -1,0 +1,50 @@
+<script type="text/javascript">
+    RED.nodes.registerType('coap request',{
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            method: {value: "get"},
+            url: {value:""},
+            observe: {value: "1"},
+            name: {value:""}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "file.png",
+        align: "right",
+        label: function() {
+            return this.name || "coap request";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="coap request">
+    <div class="form-row">
+        <label for="node-input-url"><i class="fa fa-bookmark"></i> URL</label>
+        <input type="text" id="node-input-url">
+    </div>
+    <div class="form-row">
+        <label for="node-input-method"><i class="fa fa-bookmark"></i> Method</label>
+        <select id="node-input-method">
+          <option value="get">GET</option>
+          <option value="post">POST</option>
+          <option value="put">PUT</option>
+          <option value="delete">DELETE</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-observe"><i class="fa fa-bookmark"></i> Observe</label>
+        <select id="node-input-observe">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="coap request">
+    <p>Coap request.</p>
+</script>
