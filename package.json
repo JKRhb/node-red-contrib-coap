@@ -1,0 +1,27 @@
+{
+    "name" : "node-red-contrib-coap",
+    "version" : "0.0.1",
+    "description" : "Coap connectivity for node red- prototype for #GETDBerlin ( http://get-d.net ).",
+    "dependencies": {	
+        "coap" : "0.8.0",
+        "cbor" : "0.3.10"
+    },
+    "license": "Apache",
+    "repository" : {
+        "type":"git",
+        "url":"https://github.com/gatesense/node-red-contrib-coap.git"
+    },
+    "keywords": [ "node-red", "iot", "coap", "cbor"],
+    "node-red" : {
+        "nodes": {
+            "async": "async.js"
+        }
+    },
+    "directories" : {	
+        "icons": "icons"
+    },
+    "author": {
+        "name": "Justas Azna",
+        "email": "ja@fadeit.dk"
+    }
+}
