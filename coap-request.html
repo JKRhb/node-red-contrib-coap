@@ -5,12 +5,12 @@
         defaults: {
             method: {value: "get"},
             url: {value:""},
-            observe: {value: "1"},
+            'content-format': {value: "text/plain"},
             name: {value:""}
         },
         inputs:1,
         outputs:1,
-        icon: "file.png",
+        icon: "white-globe.png",
         align: "right",
         label: function() {
             return this.name || "coap request";
@@ -33,10 +33,15 @@
         </select>
     </div>
     <div class="form-row">
-        <label for="node-input-observe"><i class="fa fa-bookmark"></i> Observe</label>
-        <select id="node-input-observe">
-          <option value="0">No</option>
-          <option value="1">Yes</option>
+        <label for="node-input-content-format"><i class="fa fa-bookmark"></i> Content format</label>
+        <select id="node-input-content-format">
+          <option>text/plain</option>
+          <option>application/link-format</option>
+          <option>application/xml</option>
+          <option>application/octet-stream</option>
+          <option>application/exi</option>
+          <option>application/json</option>
+          <option>application/cbor</option>
         </select>
     </div>
     <div class="form-row">
