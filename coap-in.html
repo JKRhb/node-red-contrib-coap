@@ -1,0 +1,92 @@
+<!-- CoAP server configuration node -->
+<script type="text/x-red" data-template-name="coap-server">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="fa fa-bookmark"></i> Name </label>
+        <input type="text" id="node-config-input-name">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-port">Port</label>
+        <input type="text" id="node-config-input-port" placeholder="5683">
+    <div class="form-tips">
+        Foobar
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="coap-server">
+   <p>This configuration node creates a CoAP Server using the specified path and port</p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('coap-server',{
+        category: 'config',
+        defaults: {
+            name: {value:""},
+            port: {value:5683}
+        },
+        inputs:0,
+        outputs:0,
+        label: function() {
+            return this.name;
+        },
+        oneditprepare: function() {
+            var root = RED.settings.httpNodeRoot.slice(0,-1);
+            if (root == "") {
+                $("#node-config-coap-tip").hide();
+            } else {
+                $("#node-config-coap-path").html(root);
+                $("#node-config-coap-tip").show();
+            }
+        }
+    });
+</script>
+
+<!-- CoAP server resource -->
+<script type="text/x-red" data-template-name="coap in">
+    <div class="form-row">
+        <label for="node-input-server"><i class="fa fa-bookmark"></i> Server</label>
+        <input type="text" id="node-input-server">
+    </div>
+    <div class="form-row">
+        <label for="node-input-url"><i class="fa fa-tag"></i> url</label>
+        <input type="text" id="node-input-url" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="coap in">
+    <p>Coap input node.</p>
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('coap in',{
+        category: 'input',
+        defaults: {
+            name: {value:""},
+            server: {type:"coap-server"},
+            url: {value:"/",required:true},
+        },
+        color:"rgb(215, 215, 160)",
+        inputs:0,
+        outputs:1,
+        icon: "white-globe.png",
+
+        label: function() {
+            if (this.name) {
+                return this.name;
+            //TODO: get the server port for displaying
+            //} else if (this.server && this.url) {
+            //    return "[coap] :" + this.server.port + (this.url.charAt(0) == "/" ? this.url : "/" + this.url);
+            } else if (this.url) {
+                return "[coap] " + (this.url.charAt(0) == "/" ? this.url : "/" + this.url);
+            } else {
+                return "coap";
+            }
+        },
+        labelStyle: function() {
+            return this.name?"node_label_italic":"";
+        }
+    });
+</script>

@@ -14,7 +14,8 @@
     "keywords": [ "node-red", "iot", "coap", "cbor"],
     "node-red" : {
         "nodes": {
-            "async": "async.js"
+            "coap-in": "coap-in.js",
+            "coap-request": "coap-request.js"
         }
     },
     "directories" : {	
@@ -23,5 +24,9 @@
     "author": {
         "name": "Justas Azna",
         "email": "ja@fadeit.dk"
-    }
+    },
+    "contributors": [
+        {"name": "Eelco Wiersma"},
+        {"name": "Justas Azna"}
+    ]
 }
