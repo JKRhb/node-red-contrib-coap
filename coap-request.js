@@ -62,7 +62,7 @@ module.exports = function(RED) {
                                 return false;
                             }
                             node.send({
-                                payload: data
+                                payload: data[0]
                             });
                         });
                     } else {
