@@ -10,11 +10,11 @@ if (!process.version.match(/^v0\.[0-9]\./)) {
         nock = null;
     }
 }
-var RED = require("/var/www/node-red/red/red.js");
-var redNodes = require("/var/www/node-red/red/nodes");
-var flows = require("/var/www/node-red/red/nodes/flows");
-var credentials = require("/var/www/node-red/red/nodes/credentials");
-var comms = require("/var/www/node-red/red/comms.js");
+var RED = require("../node_modules/node-red/red/red.js");
+var redNodes = require("../node_modules/node-red/red/nodes");
+var flows = require("../node_modules/node-red/red/nodes/flows");
+var credentials = require("../node_modules/node-red/red/nodes/credentials");
+var comms = require("../node_modules/node-red/red/comms.js");
 
 var http = require('http');
 var express = require('express');
