@@ -2,14 +2,14 @@ module.exports = function(RED) {
     "use strict";
     var coap = require('coap');
 
-    // A node red node that sets up a local websocket server
+    // A node red node that sets up a local coap server
     function CoapServerNode(n) {
         // Create a RED node
         RED.nodes.createNode(this,n);
         var node = this;
 
         // Store local copies of the node configuration (as defined in the .html)
-        node.options = Object();
+        node.options = {};
         node.options.name = n.name;
         node.options.port = n.port;
 
@@ -19,10 +19,10 @@ module.exports = function(RED) {
         node.server = new coap.createServer();
         node.server.on('request', function(req, res) {
             node.handleRequest(req, res);
-        })
+        });
         node.server.listen(node.options.port, function() {
-          console.log('server started')
-        })
+          console.log('server started');
+        });
 
         node.on("close", function() {
             node._inputNodes = [];
@@ -33,18 +33,18 @@ module.exports = function(RED) {
 
     CoapServerNode.prototype.registerInputNode = function(/*Node*/resource){
         this._inputNodes.push(resource);
-    }
+    };
 
     CoapServerNode.prototype.handleRequest = function(req, res){
 
-        //TODO: Check if there are any matching resource. If the resource is .well-know- return the resource directory to the client
+        //TODO: Check if there are any matching resource. If the resource is .well-known return the resource directory to the client
         for (var i = 0; i < this._inputNodes.length; i++) {
             if (this._inputNodes[i].options.url == req.url) {
                 var inNode = this._inputNodes[i];
                 inNode.send({'req': req, 'res': res});
             }
         }
-    }
+    };
 
     function CoapInNode(n) {
         RED.nodes.createNode(this,n);
@@ -59,9 +59,9 @@ module.exports = function(RED) {
         }
 
         //copy coap in node configuration locally
-        this.options = Object();
+        this.options = {};
         this.options.name = n.name;
         this.options.url = n.url.charAt(0) == "/" ? n.url : "/" + n.url;
     }
     RED.nodes.registerType("coap in",CoapInNode);
-}
+};

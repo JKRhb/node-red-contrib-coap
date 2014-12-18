@@ -6,16 +6,25 @@
         "coap" : "0.8.0",
         "cbor" : "0.3.10"
     },
+    "devDependencies": {
+        "grunt": "0.4.5",
+        "grunt-cli": "0.1.13",
+        "grunt-simple-mocha": "0.4.0",
+        "grunt-contrib-jshint": "0.10.0",
+        "mocha": "2.0.1",
+        "should": "4.4.1",
+        "sinon": "1.12.2"
+    },
     "license": "Apache",
     "repository" : {
         "type":"git",
         "url":"https://github.com/gatesense/node-red-contrib-coap.git"
     },
-    "keywords": [ "node-red", "iot", "coap", "cbor"],
+    "keywords": [ "node-red", "node-red-contrib", "iot", "coap", "udp", "cbor"],
     "node-red" : {
         "nodes": {
-            "coap-in": "coap-in.js",
-            "coap-request": "coap-request.js"
+            "coap-in": "coap/coap-in.js",
+            "coap-request": "coap/coap-request.js"
         }
     },
     "directories" : {	
