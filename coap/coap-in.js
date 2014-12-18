@@ -21,7 +21,7 @@ module.exports = function(RED) {
             node.handleRequest(req, res);
         });
         node.server.listen(node.options.port, function() {
-          console.log('server started');
+            console.log('server started');
         });
 
         node.on("close", function() {
@@ -48,20 +48,24 @@ module.exports = function(RED) {
 
     function CoapInNode(n) {
         RED.nodes.createNode(this,n);
-        this.server = n.server;
-        var node = this;
-        
-        this.serverConfig = RED.nodes.getNode(this.server);
+        //var node = this;
+
+        //copy "coap in" node configuration locally
+        this.options = {};
+        this.options.name = n.name;
+        this.options.server = n.server;
+        this.options.url = n.url.charAt(0) == "/" ? n.url : "/" + n.url;
+
+        this.serverConfig = RED.nodes.getNode(this.options.server);
+
         if (this.serverConfig) {
             this.serverConfig.registerInputNode(this);
         } else {
             this.error("Missing server configuration");
+            //this.error(JSON.stringify(n));
+            //this.error(JSON.stringify(RED.nodes));
         }
 
-        //copy coap in node configuration locally
-        this.options = {};
-        this.options.name = n.name;
-        this.options.url = n.url.charAt(0) == "/" ? n.url : "/" + n.url;
     }
     RED.nodes.registerType("coap in",CoapInNode);
 };

@@ -7,13 +7,15 @@
         "cbor" : "0.3.10"
     },
     "devDependencies": {
+        "express": "3.17.2",
         "grunt": "0.4.5",
         "grunt-cli": "0.1.13",
         "grunt-simple-mocha": "0.4.0",
         "grunt-contrib-jshint": "0.10.0",
         "mocha": "2.0.1",
         "should": "4.4.1",
-        "sinon": "1.12.2"
+        "sinon": "1.12.2",
+	"when" : "3.6.4"
     },
     "license": "Apache",
     "repository" : {
