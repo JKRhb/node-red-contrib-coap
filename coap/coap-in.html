@@ -47,6 +47,15 @@ RED.nodes.registerType('coap-server',{
         <input type="text" id="node-input-server">
     </div>
     <div class="form-row">
+        <label for="node-input-method"><i class="fa fa-tasks"></i> Method</label>
+        <select id="node-input-method">
+          <option value="GET">GET</option>
+          <option value="POST">POST</option>
+          <option value="PUT">PUT</option>
+          <option value="DELETE">DELETE</option>
+        </select>
+    </div>
+    <div class="form-row">
         <label for="node-input-url"><i class="fa fa-tag"></i> url</label>
         <input type="text" id="node-input-url" placeholder="Name">
     </div>
@@ -64,6 +73,12 @@ RED.nodes.registerType('coap-server',{
 RED.nodes.registerType('coap in',{
   category: 'input',
   defaults: {
+    method: {
+              value:"GET",
+              required:true,
+              validate:
+                function(v){return v == "GET" || v == "PUT" || v == "POST" || v == "DELETE";} 
+            },
     name: {value:""},
     server: {type:"coap-server",required:true},
     url: {value:"/",required:true},

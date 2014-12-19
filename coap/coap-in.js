@@ -39,7 +39,9 @@ module.exports = function(RED) {
 
         //TODO: Check if there are any matching resource. If the resource is .well-known return the resource directory to the client
         for (var i = 0; i < this._inputNodes.length; i++) {
-            if (this._inputNodes[i].options.url == req.url) {
+            if (this._inputNodes[i].options.url == req.url &&
+                this._inputNodes[i].options.method == req.method) {
+
                 var inNode = this._inputNodes[i];
                 inNode.send({'req': req, 'res': res});
             }
@@ -52,6 +54,7 @@ module.exports = function(RED) {
 
         //copy "coap in" node configuration locally
         this.options = {};
+        this.options.method = n.method;
         this.options.name = n.name;
         this.options.server = n.server;
         this.options.url = n.url.charAt(0) == "/" ? n.url : "/" + n.url;
