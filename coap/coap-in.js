@@ -21,7 +21,8 @@ module.exports = function(RED) {
             node.handleRequest(req, res);
         });
         node.server.listen(node.options.port, function() {
-            console.log('server started');
+            //console.log('server started');
+            node.log('CoAP Server Started');
         });
 
         node.on("close", function() {
@@ -50,7 +51,6 @@ module.exports = function(RED) {
 
     function CoapInNode(n) {
         RED.nodes.createNode(this,n);
-        //var node = this;
 
         //copy "coap in" node configuration locally
         this.options = {};
@@ -65,8 +65,6 @@ module.exports = function(RED) {
             this.serverConfig.registerInputNode(this);
         } else {
             this.error("Missing server configuration");
-            //this.error(JSON.stringify(n));
-            //this.error(JSON.stringify(RED.nodes));
         }
 
     }

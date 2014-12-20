@@ -10,76 +10,107 @@ module.exports = function(RED) {
     function CoapRequestNode(n) {
         RED.nodes.createNode(this, n);
         var node = this;
-        var method = (n.method || 'GET').toUpperCase();
 
-        this.on('input', function(msg) {
+        // copy "coap request" configuration locally
+        node.options = {};
+        node.options.method = (n.method || 'GET').toUpperCase();
+        node.options.observe = n.observe;
+        node.options.name = n.name;
+        node.options.url = n.url;
+        node.options.contentFormat = n['content-format'];
 
-            var opts = url.parse(n.url);
-        
-            opts.method = method;
-            opts.headers = {};
-        
-            if (n['content-format']) {
-                opts.headers['Content-Format'] = n['content-format'];
-            }
-            
+        function _constructPayload(msg, contentFormat) {
             var payload = null;
 
             if (typeof msg.payload === "string" || Buffer.isBuffer(msg.payload)) {
                 payload = msg.payload;
-            } else if (typeof msg.payload == "number") {
-                payload = msg.payload+"";
+            } else if (typeof msg.payload === "number") {
+                payload = msg.payload + "";
             } else {
-                if (opts.headers['Content-Format'] === 'application/json') {
+                if (contentFormat === 'application/json') {
                     payload = JSON.stringify(msg.payload);
-                } else if (opts.headers['Content-Format'] === 'application/cbor') {
+                } else if (contentFormat === 'application/cbor') {
                     payload = cbor.encode(msg.payload);
                 }
             }
 
-            if (msg.observe === true) {
-                opts.observe = '1';
-            } else {
-                delete opts.observe;
+            return payload;
+        }
+
+        // this is for testing purposes- payloadDecodedHandler should be set by test code to inspect the payload
+        node.payloadDecodedHandler = function(payload) {};
+        function onPayloadDecoded(payload) { 
+            node.payloadDecodedHandler(payload);
+        }
+
+        function _onCborDecode(err, data) {
+            if (err) {
+                //console.error(err.message);
+                return false;
+            }
+            var payload = data[0];
+            node.send({
+                payload: payload,
+            });
+            onPayloadDecoded(payload);
+        }
+
+        function _makeRequest(msg) {
+            var reqOpts = url.parse(node.options.url);
+            reqOpts.method = node.options.method;
+            reqOpts.headers = {};
+            reqOpts.headers['Content-Format'] = node.options.contentFormat;
+            function _onResponse(res) {
+                function _onResponseData(data) {
+                    var payload = null;
+                    if (res.headers['Content-Format'] === 'application/json') {
+                        payload = JSON.parse(data.toString());
+                        node.send({
+                            payload: payload,
+                        });
+                        onPayloadDecoded(payload);
+                    } else if (res.headers['Content-Format'] === 'application/cbor') {
+                        cbor.decode(data, _onCborDecode);
+                    } else {
+                        payload = data;
+                        node.send({
+                            payload: payload,
+                        });
+                        onPayloadDecoded(payload);
+                    }
+                }
+
+                res.on('data', _onResponseData);
+
+                if (reqOpts.observe) {
+                    node.stream = res;
+                }
             }
 
+            var payload = _constructPayload(msg, node.options['content-format']);
+
+            if (node.options.observe === true) {
+                reqOpts.observe = '1';
+            } else {
+                delete reqOpts.observe;
+            }
+
+            //TODO: should revisit this block
             if (node.stream) {
                 node.stream.close();
             }
-            
-            var req = coap.request(opts);
-            
-            req.on('response', function(res) {
-                res.on('data', function(data) {
-                    if (res.headers['Content-Format'] === 'application/json') {
-                        node.send({
-                            payload: JSON.parse(data.toString())
-                        });
-                    } else if (res.headers['Content-Format'] === 'application/cbor') {
-                        cbor.decode(data, function(err, data) {
-                            if (err) {
-                                console.error(err.message);
-                                return false;
-                            }
-                            node.send({
-                                payload: data[0]
-                            });
-                        });
-                    } else {
-                        node.send({
-                            payload: data
-                        });
-                    }
-                });
 
-                if (opts.observe) {
-                    node.stream = res;
-                }
-            });
+            var req = coap.request(reqOpts);
+            req.on('response', _onResponse);
+
             if (payload) {
                 req.write(payload);
             }
             req.end();
+        }
+
+        this.on('input', function(msg) {
+            _makeRequest(msg);
         });
     }
     RED.nodes.registerType("coap request", CoapRequestNode);

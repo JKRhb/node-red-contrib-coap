@@ -52,6 +52,11 @@ describe('CoapInNode', function() {
         var messagePut = 'This resource sucks- need to change it';
         var messagePost = 'Welcome aboard!';
         var messageDelete = 'Erase and rewind...';
+
+        // The flow:
+        // - single coap server
+        // - 4 coap in nodes which represent a single resource (/test) and react to different CoAP verbs (GET, PUT, POST, DELETE)
+        // - 4 function nodes which respond to requests which come through coap in nodes (act as our coap out nodes).
         var flow = [
                     {
                         id:"coapServer1",
