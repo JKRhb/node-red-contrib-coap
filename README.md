@@ -1,6 +1,7 @@
 node-red-contrib-coap
 =====================
 [![Build Status](https://travis-ci.org/gatesense/node-red-contrib-coap.png)](https://travis-ci.org/gatesense/node-red-contrib-coap) [![Coverage Status](https://coveralls.io/repos/gatesense/node-red-contrib-coap/badge.png)](https://coveralls.io/r/gatesense/node-red-contrib-coap)
+[![Dependency Status](https://david-dm.org/gatesense/node-red-contrib-coap.png)](https://david-dm.org/gatesense/node-red-contrib-coap)
 
 This project adds CoAP support to [Node-RED](http://nodered.org/). It is based on Matteo Collina's [node-coap](https://github.com/mcollina/node-coap).
 

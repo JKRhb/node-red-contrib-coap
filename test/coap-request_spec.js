@@ -469,5 +469,4 @@ describe('CoapRequestNode', function() {
             }, 1000);
         });
     });
-
 });
