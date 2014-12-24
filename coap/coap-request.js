@@ -45,7 +45,6 @@ module.exports = function(RED) {
 
         function _onCborDecode(err, data) {
             if (err) {
-                //console.error(err.message);
                 return false;
             }
             var payload = data[0];
