@@ -22,16 +22,12 @@ module.exports = function(RED) {
         function _constructPayload(msg, contentFormat) {
             var payload = null;
 
-            if (typeof msg.payload === "string" || Buffer.isBuffer(msg.payload)) {
+            if (contentFormat === 'text/plain') {
                 payload = msg.payload;
-            } else if (typeof msg.payload === "number") {
-                payload = msg.payload + "";
-            } else {
-                if (contentFormat === 'application/json') {
-                    payload = JSON.stringify(msg.payload);
-                } else if (contentFormat === 'application/cbor') {
-                    payload = cbor.encode(msg.payload);
-                }
+            } else if (contentFormat === 'application/json') {
+                payload = JSON.stringify(msg.payload);
+            } else if (contentFormat === 'application/cbor') {
+                payload = cbor.encode(msg.payload);
             }
 
             return payload;
@@ -62,7 +58,13 @@ module.exports = function(RED) {
             function _onResponse(res) {
                 function _onResponseData(data) {
                     var payload = null;
-                    if (res.headers['Content-Format'] === 'application/json') {
+                    if (res.headers['Content-Format'] === 'text/plain') {
+                        payload = data;
+                        node.send({
+                            payload: payload,
+                        });
+                        onPayloadDecoded(payload);
+                    } else if (res.headers['Content-Format'] === 'application/json') {
                         payload = JSON.parse(data.toString());
                         node.send({
                             payload: payload,
@@ -70,13 +72,7 @@ module.exports = function(RED) {
                         onPayloadDecoded(payload);
                     } else if (res.headers['Content-Format'] === 'application/cbor') {
                         cbor.decode(data, _onCborDecode);
-                    } else {
-                        payload = data;
-                        node.send({
-                            payload: payload,
-                        });
-                        onPayloadDecoded(payload);
-                    }
+                    } 
                 }
 
                 res.on('data', _onResponseData);
@@ -86,7 +82,7 @@ module.exports = function(RED) {
                 }
             }
 
-            var payload = _constructPayload(msg, node.options['content-format']);
+            var payload = _constructPayload(msg, node.options.contentFormat);
 
             if (node.options.observe === true) {
                 reqOpts.observe = '1';
