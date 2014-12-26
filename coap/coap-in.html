@@ -2,18 +2,18 @@
 <script type="text/x-red" data-template-name="coap-server">
 <div class="form-row">
         <label for="node-config-input-name"><i class="fa fa-bookmark"></i> Name </label>
-        <input type="text" id="node-config-input-name"/>
+        <input type="text" id="node-config-input-name" placeholder="Name"/>
     </div>
     <div class="form-row">
         <label for="node-config-input-port">Port</label>
         <input type="text" id="node-config-input-port" placeholder="5683"/>
     <div class="form-tips">
-        Foobar
+        <i>CoAP</i> is based on <i>UDP</i> so you may need to open a <i>UDP</i> port in your firewall.
     </div>
 </script>
 
 <script type="text/x-red" data-help-name="coap-server">
-<p>This configuration node creates a CoAP Server using the specified path and port</p>
+<p>This configuration node creates a CoAP Server using the specified UDP port</p>
 </script>
 
 <script type="text/javascript">
@@ -21,22 +21,20 @@ RED.nodes.registerType('coap-server',{
   category: 'config',
   defaults: {
     name: {value:""},
-    port: {value:5683}
+    port: {value:5683, required:true}
   },
   inputs:0,
   outputs:0,
   label: function() {
     return this.name;
   },
-  oneditprepare: function() {
-    var root = RED.settings.httpNodeRoot.slice(0,-1);
-    if (root == "") {
-      $("#node-config-coap-tip").hide();
-    } else {
-      $("#node-config-coap-path").html(root);
-      $("#node-config-coap-tip").show();
+  label: function() {
+    if (this.name) {
+      return this.name;
+    } else if (this.port) {
+      return "UDP " + this.port;
     }
-  }
+  },
 });
 </script>
 
@@ -57,7 +55,7 @@ RED.nodes.registerType('coap-server',{
     </div>
     <div class="form-row">
         <label for="node-input-url"><i class="fa fa-tag"></i> url</label>
-        <input type="text" id="node-input-url" placeholder="Name"/>
+        <input type="text" id="node-input-url" placeholder="/foo"/>
     </div>
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
@@ -66,7 +64,15 @@ RED.nodes.registerType('coap-server',{
 </script>
 
 <script type="text/x-red" data-help-name="coap in">
-<p>Coap input node.</p>
+<p>Provides a node for defining resources on local CoAP servers.</p>
+
+<p>The resulting message has the following properties:
+    <ul>
+        <li>msg.req : coap request</li>
+        <li>msg.res : coap response</li>
+    </ul>
+</p>
+<p>See <a href="https://github.com/mcollina/node-coap">node-coap</a> for more details on how to handle requests.</p>
 </script>
 
 <script type="text/javascript">
@@ -74,31 +80,37 @@ RED.nodes.registerType('coap in',{
   category: 'input',
   defaults: {
     method: {
-              value:"GET",
-              required:true,
-              validate:
-                function(v){return v == "GET" || v == "PUT" || v == "POST" || v == "DELETE";} 
-            },
+      value:"GET",
+      required:true,
+      validate:
+        function(v){return v == "GET" || v == "PUT" || v == "POST" || v == "DELETE";} 
+    },
     name: {value:""},
     server: {type:"coap-server",required:true},
-    url: {value:"/",required:true},
+    url: {required:true},
   },
   color:"rgb(215, 215, 160)",
   inputs:0,
   outputs:1,
   icon: "white-globe.png",
-
   label: function() {
     if (this.name) {
       return this.name;
     } else if (this.url) {
-      return "[coap] " + (this.url.charAt(0) == "/" ? this.url : "/" + this.url);
+      var root = "/";
+
+      if (this.url.charAt(0) == "/") {
+        root += this.url.slice(1);
+      } else {
+        root += this.url;
+      }
+      return "["+this.method+"] "+root;
     } else {
       return "coap";
     }
   },
   labelStyle: function() {
     return this.name?"node_label_italic":"";
-  }
+  },
 });
 </script>
