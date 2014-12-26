@@ -33,19 +33,44 @@ module.exports = function(RED) {
     RED.nodes.registerType("coap-server",CoapServerNode);
 
     CoapServerNode.prototype.registerInputNode = function(/*Node*/resource){
-        this._inputNodes.push(resource);
+        var exists = false;
+        for (var i = 0; i < this._inputNodes.length; i++) {
+            if (this._inputNodes[i].options.url == resource.options.url &&
+                this._inputNodes[i].options.method == resource.options.method) {
+                var exists = true;
+
+                //TODO: Does this have any effect? Should show the error in the frontend somehow? Some kind of status bar?
+                this.error("Node with the specified URL and Method already exists!");
+            }
+        }
+        if (!exists) {
+            this._inputNodes.push(resource);
+        }
     };
 
     CoapServerNode.prototype.handleRequest = function(req, res){
 
         //TODO: Check if there are any matching resource. If the resource is .well-known return the resource directory to the client
+        var matchResource = false;
+        var matchMethod = false;
         for (var i = 0; i < this._inputNodes.length; i++) {
-            if (this._inputNodes[i].options.url == req.url &&
-                this._inputNodes[i].options.method == req.method) {
-
-                var inNode = this._inputNodes[i];
-                inNode.send({'req': req, 'res': res});
+            if (this._inputNodes[i].options.url == req.url) {
+                matchResource = true;
+                if (this._inputNodes[i].options.method == req.method) {
+                    matchMethod = true;
+                    var inNode = this._inputNodes[i];
+                    inNode.send({'req': req, 'res': res});
+                }
             }
+        }
+        if (!matchResource) {
+            res.code = '4.04';
+            return res.end();
+        }
+
+        if (!matchMethod) {
+            res.code = '4.05';
+            return res.end();
         }
     };
 
