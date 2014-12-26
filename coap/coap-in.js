@@ -37,7 +37,7 @@ module.exports = function(RED) {
         for (var i = 0; i < this._inputNodes.length; i++) {
             if (this._inputNodes[i].options.url == resource.options.url &&
                 this._inputNodes[i].options.method == resource.options.method) {
-                var exists = true;
+                exists = true;
 
                 //TODO: Does this have any effect? Should show the error in the frontend somehow? Some kind of status bar?
                 this.error("Node with the specified URL and Method already exists!");
