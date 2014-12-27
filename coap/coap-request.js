@@ -36,7 +36,7 @@ module.exports = function(RED) {
         // this is for testing purposes- payloadDecodedHandler should be set by test code to inspect the payload
         node.payloadDecodedHandler = function(payload) {};
 
-        function onPayloadDecoded(payload, req, res) { 
+        function onPayloadDecoded(payload) { 
             node.payloadDecodedHandler(payload);
         }
 
