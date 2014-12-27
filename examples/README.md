@@ -14,6 +14,7 @@ Import *server_flow.json* to your *Node-RED* instance and start red.js. Then, ca
 coap get coap://localhost/hello
 ```
 
-**Observer (CoAP client) written in Node-RED**
+Observer (CoAP client) written in Node-RED
+------------------------------------------
 
 Start *observe_server.js*. Then import *client_flow.json* to your *Node-RED* instance and start *red.js*.
