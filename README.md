@@ -2,6 +2,7 @@ node-red-contrib-coap
 =====================
 [![Build Status](https://travis-ci.org/gatesense/node-red-contrib-coap.png)](https://travis-ci.org/gatesense/node-red-contrib-coap) [![Coverage Status](https://coveralls.io/repos/gatesense/node-red-contrib-coap/badge.png)](https://coveralls.io/r/gatesense/node-red-contrib-coap)
 [![Dependency Status](https://david-dm.org/gatesense/node-red-contrib-coap.png)](https://david-dm.org/gatesense/node-red-contrib-coap)
+[![Dev Dependency Status](https://david-dm.org/gatesense/node-red-contrib-coap/dev-status.png)](https://david-dm.org/gatesense/node-red-contrib-coap#dev-badge-embed)
 
 This project adds CoAP support to [Node-RED](http://nodered.org/). It is based on Matteo Collina's [node-coap](https://github.com/mcollina/node-coap).
 
@@ -18,3 +19,7 @@ git clone https://github.com/gatesense/node-red-contrib-coap.git
 cd ./node-red-contrib-coap
 npm install
 ```
+
+Examples
+--------
+You can check out a couple of usage examples at *./examples* directory of this repo.

@@ -35,7 +35,8 @@ module.exports = function(RED) {
 
         // this is for testing purposes- payloadDecodedHandler should be set by test code to inspect the payload
         node.payloadDecodedHandler = function(payload) {};
-        function onPayloadDecoded(payload) { 
+
+        function onPayloadDecoded(payload, req, res) { 
             node.payloadDecodedHandler(payload);
         }
 
@@ -59,7 +60,7 @@ module.exports = function(RED) {
                 function _onResponseData(data) {
                     var payload = null;
                     if (res.headers['Content-Format'] === 'text/plain') {
-                        payload = data;
+                        payload = data.toString();
                         node.send({
                             payload: payload,
                         });
@@ -73,6 +74,12 @@ module.exports = function(RED) {
                     } else if (res.headers['Content-Format'] === 'application/cbor') {
                         cbor.decode(data, _onCborDecode);
                     } 
+                    else {
+                        node.send({
+                            payload: data.toString(),
+                        });
+                        onPayloadDecoded(data.toString());
+                    }
                 }
 
                 res.on('data', _onResponseData);
