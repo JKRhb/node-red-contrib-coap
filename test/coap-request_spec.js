@@ -326,7 +326,8 @@ describe('CoapRequestNode', function() {
     it('should be able to serialize request payload in a number of formats', function(done) {
 
         // The flow:
-        // -
+        // - 3 "inject" nodes which trigger "coap request" nodes
+        // - 3 "coap request" nodes which send content serialized in text/plain, application/json and application/cbor formats respectively.
         var message1 = 'message1';
         var message2 = 'message2';
         var message3 = 'message3';
