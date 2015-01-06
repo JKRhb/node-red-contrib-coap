@@ -10,6 +10,7 @@
                 function(v){return v == "GET" || v == "PUT" || v == "POST" || v == "DELETE";} 
             },
             observe: {value:false, required:true},
+            confirmable: {value:true, required:true},
             url: {value:"", required:true},
             'content-format': {value: "text/plain", required:true},
             name: {value:""}
@@ -29,11 +30,7 @@
 
 <script type="text/x-red" data-template-name="coap request">
     <div class="form-row">
-        <label for="node-input-url"><i class="fa fa-globe"></i> URL</label>
-        <input type="text" id="node-input-url" placeholder="coap://localhost/test"/>
-    </div>
-    <div class="form-row">
-        <label for="node-input-method"><i class="fa fa-tasks"></i> Method</label>
+        <label for="node-input-method" style="width:120px;"><i class="fa fa-tasks"></i> Method</label>
         <select id="node-input-method">
           <option value="GET">GET</option>
           <option value="PUT">PUT</option>
@@ -41,14 +38,8 @@
           <option value="DELETE">DELETE</option>
         </select>
     </div>
-    <div class="form-row">
-        <!-- Empty label for alignment -->
-        <label/> 
-        <input id="node-input-observe" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;"/>
-        <label for="node-input-observe">Observe?</label>
-    </div>
-    <div class="form-row">
-        <label for="node-input-content-format"><i class="fa fa-file"></i> Content format</label>
+        <div class="form-row">
+        <label for="node-input-content-format" style="width:120px;"><i class="fa fa-file"></i> Content format</label>
         <select id="node-input-content-format">
           <option>text/plain</option>
           <option>application/json</option>
@@ -56,8 +47,21 @@
         </select>
     </div>
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="foobar"/>
+        <label for="node-input-url" style="width:100px"><i class="fa fa-globe"></i> URL</label>
+        <input type="text" id="node-input-url" placeholder="coap://localhost/test"/>
+    </div>
+    <div class="form-row">
+        <label for="node-input-confirmable" style="width: 150px; margin-left:100px;">
+        <input id="node-input-confirmable" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;"/>
+        Confirmable</label>
+        <label for="node-input-observe" style="width:150px">
+        <input id="node-input-observe" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;" />
+        Observe</label>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-name" style="width:100px;"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name"/>
     </div>
 </script>
 
