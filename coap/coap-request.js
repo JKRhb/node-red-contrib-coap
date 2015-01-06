@@ -14,6 +14,7 @@ module.exports = function(RED) {
         // copy "coap request" configuration locally
         node.options = {};
         node.options.method = (n.method || 'GET').toUpperCase();
+        node.options.confirmable = n.confirmable;
         node.options.observe = n.observe;
         node.options.name = n.name;
         node.options.url = n.url;
@@ -95,6 +96,11 @@ module.exports = function(RED) {
                 reqOpts.observe = '1';
             } else {
                 delete reqOpts.observe;
+            }
+            
+            if (node.options.confirmable === false){
+                console.log('non confirmable');
+                reqOpts.confirmable = false;
             }
 
             //TODO: should revisit this block
