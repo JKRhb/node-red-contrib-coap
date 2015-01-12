@@ -10,8 +10,16 @@ Functionality
 -------------
  We introduce "coap request" and "coap in" nodes which can be used in a similar fashion to "http request"and "http in" nodes from Node-RED's core.
 
-Installation
-------------
+Install
+-------
+
+```bash
+cd $NODE_RED_HOME
+npm install node-red-contrib-coap
+```
+
+Install from Source
+-------------------
 
 ```bash
 cd $NODE_RED_HOME/nodes
