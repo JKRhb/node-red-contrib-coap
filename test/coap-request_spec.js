@@ -31,6 +31,7 @@ describe('CoapRequestNode', function() {
                         "content-format": "application/json",
                         method: "POST",
                         name: "coapRequestPost",
+                        confirmable: true,
                         observe: false,
                         url: "/test-resource",
                     },
@@ -40,6 +41,7 @@ describe('CoapRequestNode', function() {
             var coapRequest1 = helper.getNode("coapRequest1");
             coapRequest1.options.should.have.property('method', 'POST');
             coapRequest1.options.should.have.property('name', 'coapRequestPost');
+            coapRequest1.options.should.have.property('confirmable', true);
             coapRequest1.options.should.have.property('observe', false);
             coapRequest1.options.should.have.property('url', '/test-resource');
             done();
@@ -70,6 +72,7 @@ describe('CoapRequestNode', function() {
                         "content-format": "text/plain",
                         method: "GET",
                         name: "coapRequestGet",
+                        confirmable: true,
                         observe: false,
                         url: "coap://localhost:8888/test-resource",
                     },
@@ -90,6 +93,7 @@ describe('CoapRequestNode', function() {
                         "content-format": "text/plain",
                         method: "PUT",
                         name: "coapRequestPut",
+                        confirmable: true,
                         observe: false,
                         url: "coap://localhost:8888/test-resource",
                     },
@@ -110,6 +114,7 @@ describe('CoapRequestNode', function() {
                         "content-format": "text/plain",
                         method: "POST",
                         name: "coapRequestPost",
+                        confirmable: true,
                         observe: false,
                         url: "coap://localhost:8888/test-resource",
                     },
@@ -130,6 +135,7 @@ describe('CoapRequestNode', function() {
                         "content-format": "text/plain",
                         method: "DELETE",
                         name: "coapRequestDelete",
+                        confirmable: true,
                         observe: false,
                         url: "coap://localhost:8888/test-resource",
                     },
@@ -233,6 +239,7 @@ describe('CoapRequestNode', function() {
                         "content-format": "text/plain",
                         method: "GET",
                         name: "coapRequestGetObserve1",
+                        confirmable: true,
                         observe: true,
                         url: "coap://localhost:8889/test-resource1",
                     },
@@ -253,6 +260,7 @@ describe('CoapRequestNode', function() {
                         "content-format": "text/plain",
                         method: "GET",
                         name: "coapRequestGetObserve2",
+                        confirmable: true,
                         observe: true,
                         url: "coap://localhost:8889/test-resource2",
                     },
@@ -349,6 +357,7 @@ describe('CoapRequestNode', function() {
                         "content-format": "text/plain",
                         method: "POST",
                         name: "coapRequestPost1",
+                        confirmable: true,
                         observe: false,
                         url: "coap://localhost:8890/test-resource",
                     },
@@ -369,6 +378,7 @@ describe('CoapRequestNode', function() {
                         "content-format": "application/json",
                         method: "POST",
                         name: "coapRequestPost2",
+                        confirmable: true,
                         observe: false,
                         url: "coap://localhost:8890/test-resource",
                     },
@@ -389,6 +399,7 @@ describe('CoapRequestNode', function() {
                         "content-format": "application/cbor",
                         method: "POST",
                         name: "coapRequestPost3",
+                        confirmable: true,
                         observe: false,
                         url: "coap://localhost:8890/test-resource",
                     },
