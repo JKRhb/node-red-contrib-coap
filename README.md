@@ -31,3 +31,8 @@ npm install
 Examples
 --------
 You can check out a couple of usage examples at *./examples* directory of this repo.
+
+
+Contributing
+------------
+I'm not actively developing *node-red-contrib-coap* at the moment, so please contact me, if you want to take over the development of this package or otherwise contribute - **Justas Azna / 2015-05-15**
