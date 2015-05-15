@@ -19,6 +19,10 @@ module.exports = function(RED) {
         node.server = new coap.createServer();
         node.server.on('request', function(req, res) {
             node.handleRequest(req, res);
+            res.on('error', function(err) {
+                node.log('server error');
+                node.log(err);
+            });
         });
         node.server.listen(node.options.port, function() {
             //console.log('server started');

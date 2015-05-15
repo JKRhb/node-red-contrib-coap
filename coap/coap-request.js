@@ -104,6 +104,10 @@ module.exports = function(RED) {
 
             var req = coap.request(reqOpts);
             req.on('response', _onResponse);
+            req.on('error', function(err) {
+                node.log('client error');
+                node.log(err);
+            });
 
             if (payload) {
                 req.write(payload);
