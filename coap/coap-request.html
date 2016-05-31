@@ -5,13 +5,12 @@
         defaults: {
             method: {
               value:"GET",
-              required:true,
               validate:
-                function(v){return v == "GET" || v == "PUT" || v == "POST" || v == "DELETE";} 
+                function(v){return [ "", "GET", "PUT", "POST", "DELETE" ].indexOf(v) !== -1;}
             },
             observe: {value:false, required:true},
-            url: {value:"", required:true},
-            'content-format': {value: "text/plain", required:true},
+            url: {value:""},
+            'content-format': {value: "text/plain"},
             name: {value:""}
         },
         inputs:1,
@@ -39,6 +38,7 @@
           <option value="PUT">PUT</option>
           <option value="POST">POST</option>
           <option value="DELETE">DELETE</option>
+          <option value="">- set by msg.method -</option>
         </select>
     </div>
     <div class="form-row">
@@ -66,5 +66,11 @@
 
     <p>URL, request method and content serialization format (<i>Content-Format</i>) can be configured. Also, you can add <i>Observe</i> header to your request. If the target endpoint supports <i>pub/sub</i>, you will get updated resource represantations in addition to the initial one (<a href="http://tools.ietf.org/html/draft-ietf-core-observe-11">draft-ietf-core-observe-11</a>)</p>
 
-    <p><code>msg.payload</code> can be configured by the input node of <i>coap request</i>. It will be serialized using the format specified in the <i>Content-Format</i> variable.</p>
+    <p>The following properties may be set on the message object:</p>
+
+    <ul>
+        <li><code>payload</code> will be sent in the body of the request. It will be serialized using the format specified in the <i>Content-Format</i> variable.</li>
+        <li><code>method</code> will be used the node is configured to use it. Defaults to <code>GET</code></li>
+        <li><code>url</code> will be used if no URL is configured.</li>
+    </ul>
 </script>
