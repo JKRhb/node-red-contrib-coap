@@ -183,7 +183,7 @@ describe('CoapRequestNode', function() {
             else if (req.url == "/test-resource2" && req.method == "GET") {
                 responseFn = response2;
             }
-            var interval = setInterval(responseFn, 1000);
+            var interval = setInterval(responseFn, 10);
 
             res.on('finish', function(err) {
               clearInterval(interval);
@@ -197,24 +197,24 @@ describe('CoapRequestNode', function() {
             var noUpdates1 = 0;
             var noUpdates2 = 0;
             var coapRequest1 = helper.getNode("coapRequest1");
+
+            function testCompletion() {
+                if (noUpdates1 == 3 && noUpdates2 == 3) {
+                    done();
+                }
+            }
+
             coapRequest1.payloadDecodedHandler = function(payload) {
                 payload.toString().should.equal(message1);
                 noUpdates1++;
+                testCompletion();
             };
             var coapRequest2 = helper.getNode("coapRequest2");
             coapRequest2.payloadDecodedHandler = function(payload) {
                 payload.toString().should.equal(message2);
                 noUpdates2++;
+                testCompletion();
             };
-
-            // Check for the number of updates every second- if we reach the target then the test is complete
-            var checkNoUpdatesInterval = setInterval(function() {
-                if (noUpdates1 == 3 && noUpdates2 == 3) {
-                    clearInterval(checkNoUpdatesInterval);
-                    done();
-                }
-
-            }, 1000);
         });
 
     });
