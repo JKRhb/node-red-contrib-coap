@@ -7,7 +7,7 @@ var injectNode = require("../node_modules/node-red/nodes/core/core/20-inject.js"
 
 var should = require("should");
 var helper = require("./helper.js");
-
+var linkFormat = require('h5.linkformat');
 
 // TODO:
 // - should we move the test CoAP server creation to helper.js?
@@ -230,6 +230,16 @@ describe('CoapRequestNode', function() {
             format: 'application/json',
             message: { thisIs: 'JSON' },
             decode: function (buf) { return Promise.resolve(JSON.parse(buf.toString())); }
+        },
+        {
+            format: 'application/cbor',
+            message: { thisIs: 'CBOR' },
+            decode: function (buf) { return new Promise( function (resolve, reject) {
+                cbor.decode(buf,function (error, value) {
+                    if ( error ) reject(error);
+                    else resolve(value[0]);
+                });
+            }); }
         }
     ];
 
