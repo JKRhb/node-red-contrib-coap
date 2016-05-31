@@ -1,12 +1,13 @@
 module.exports = function(RED) {
     "use strict";
-    
+
     var coap = require('coap');
     var cbor = require('cbor');
     var url = require('url');
-    
+    var linkFormat = require('h5.linkformat');
+
     coap.registerFormat('application/cbor', 60);
-  
+
     function CoapRequestNode(n) {
         RED.nodes.createNode(this, n);
         var node = this;
@@ -73,8 +74,13 @@ module.exports = function(RED) {
                         onPayloadDecoded(payload);
                     } else if (res.headers['Content-Format'] === 'application/cbor') {
                         cbor.decode(data, _onCborDecode);
-                    } 
-                    else {
+                    } else if (res.headers['Content-Format'] === 'application/link-format') {
+                        payload = linkFormat.parse( data.toString() );
+                        node.send({
+                            payload: payload,
+                        });
+                        onPayloadDecoded(payload);
+                    } else {
                         node.send({
                             payload: data.toString(),
                         });
