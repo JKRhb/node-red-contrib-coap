@@ -27,6 +27,13 @@ var url;
 
 var server;
 
+// Node-RED writes to the console using `util.log`
+// Replacing this function by a no-op makes tests output much more readable.
+try {
+	var util = require('util');
+	util.log = function(){};
+} catch (e) {}
+
 function helperNode(n) {
     RED.nodes.createNode(this, n);
 }
