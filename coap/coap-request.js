@@ -18,6 +18,7 @@ module.exports = function(RED) {
         node.options.name = n.name;
         node.options.url = n.url;
         node.options.contentFormat = n['content-format'];
+        node.options.rawBuffer = n['raw-buffer'];
 
         function _constructPayload(msg, contentFormat) {
             var payload = null;
@@ -59,7 +60,12 @@ module.exports = function(RED) {
             function _onResponse(res) {
                 function _onResponseData(data) {
                     var payload = null;
-                    if (res.headers['Content-Format'] === 'text/plain') {
+                    if ( node.options.rawBuffer ) {
+                        node.send({
+                            payload: data,
+                        });
+                        onPayloadDecoded(data);
+                    } else if (res.headers['Content-Format'] === 'text/plain') {
                         payload = data.toString();
                         node.send({
                             payload: payload,
