@@ -40,7 +40,7 @@ function helperNode(n) {
 
 module.exports = {
     load: function(testNodes, testFlows, testCredentials, cb) {
-        if (typeof testCredentials === 'function') {
+        if (typeof testCredentials !== 'object') {
             cb = testCredentials;
             testCredentials = {};
         }
@@ -75,7 +75,7 @@ module.exports = {
         }
         flows.load().then(function() {
             should.deepEqual(testFlows, flows.getFlows());
-            cb();
+            if ( cb instanceof Function ) cb();
         });
     },
     unload: function() {
