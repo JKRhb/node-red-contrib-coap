@@ -97,9 +97,9 @@ describe('CoapRequestNode', function() {
                     var server = coap.createServer();
                     server.on('request', function(req, res) {
                         res.setOption('Content-Format', 'text/plain');
-                        if (req.url == "/test-resource" && req.method == test.method) {
-                            res.end(test.message);
-                        }
+                        req.url.should.equal("/test-resource");
+                        req.method.should.equal(test.method);
+                        res.end(test.message);
                     });
                     server.listen(port);
 
