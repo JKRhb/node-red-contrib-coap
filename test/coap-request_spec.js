@@ -104,7 +104,7 @@ describe('CoapRequestNode', function() {
                     //Let's catch the response and compare the payload to the expected result.
                     var coapRequest = helper.getNode("coapRequest");
                     coapRequest.payloadDecodedHandler = function(payload) {
-                        var r = undefined;
+                        var r;
                         try {
                             payload.toString().should.equal(test.message);
                         } catch (e) { r = e; }
@@ -155,7 +155,7 @@ describe('CoapRequestNode', function() {
 
         var server = coap.createServer();
         server.on('request', function(req, res) {
-            var r = undefined;
+            var r;
             try {
                 req.url.should.equal("/test-resource");
             } catch (e) { r = e; }
@@ -205,7 +205,7 @@ describe('CoapRequestNode', function() {
 
         var server = coap.createServer();
         server.on('request', function(req, res) {
-            var r = undefined;
+            var r;
             try {
                 req.method.should.equal("PUT");
             } catch (e) { r = e; }
@@ -244,7 +244,7 @@ describe('CoapRequestNode', function() {
 
         var server = coap.createServer();
         server.on('request', function(req, res) {
-            var r = undefined;
+            var r;
             try {
                 req.method.should.equal("GET");
             } catch (e) { r = e; }
@@ -298,7 +298,7 @@ describe('CoapRequestNode', function() {
             //Let's catch the response and compare the payload to the expected result.
             var coapRequest = helper.getNode("coapRequest");
             coapRequest.payloadDecodedHandler = function(payload) {
-                var r = undefined;
+                var r;
                 try {
                     Buffer.isBuffer( payload ).should.be.true;
                     payload.toString().should.equal(message);
@@ -433,8 +433,11 @@ describe('CoapRequestNode', function() {
             message: { thisIs: 'CBOR' },
             decode: function (buf) { return new Promise( function (resolve, reject) {
                 cbor.decode(buf,function (error, value) {
-                    if ( error ) reject(error);
-                    else resolve(value[0]);
+                    if ( error ) {
+                        reject(error);
+                    } else {
+                        resolve(value[0]);
+                    }
                 });
             }); }
         }
@@ -552,7 +555,7 @@ describe('CoapRequestNode', function() {
                     //Let's catch the response and compare the payload to the expected result.
                     var coapRequest = helper.getNode("coapRequest");
                     coapRequest.payloadDecodedHandler = function(payload) {
-                        var r = undefined;
+                        var r;
                         try {
                             Buffer.isBuffer(payload).should.be.false;
                             should.deepEqual(payload, test.message);

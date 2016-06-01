@@ -75,7 +75,9 @@ module.exports = {
         }
         flows.load().then(function() {
             should.deepEqual(testFlows, flows.getFlows());
-            if ( cb instanceof Function ) cb();
+            if ( cb instanceof Function ) {
+                cb();
+            }
         });
     },
     unload: function() {
