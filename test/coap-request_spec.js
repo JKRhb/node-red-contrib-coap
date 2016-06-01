@@ -107,11 +107,9 @@ describe('CoapRequestNode', function() {
                         //Let's catch the response and compare the payload to the expected result.
                         var coapRequest = helper.getNode("coapRequest");
                         coapRequest.payloadDecodedHandler = function(payload) {
-                            var r;
-                            try {
+                            helper.endTest(done,function(){
                                 payload.toString().should.equal(test.message);
-                            } catch (e) { r = e; }
-                            done(r);
+                            });
                         };
                     });
                 });
@@ -158,11 +156,9 @@ describe('CoapRequestNode', function() {
 
             var server = coap.createServer();
             server.on('request', function(req, res) {
-                var r;
-                try {
+                helper.endTest(done,function(){
                     req.method.should.equal("PUT");
-                } catch (e) { r = e; }
-                done(r);
+                });
             });
             server.listen(port);
             helper.load(testNodes, flow);
@@ -197,11 +193,9 @@ describe('CoapRequestNode', function() {
 
             var server = coap.createServer();
             server.on('request', function(req, res) {
-                var r;
-                try {
+                helper.endTest(done,function(){
                     req.method.should.equal("GET");
-                } catch (e) { r = e; }
-                done(r);
+                });
             });
             server.listen(port);
             helper.load(testNodes, flow);
@@ -249,11 +243,9 @@ describe('CoapRequestNode', function() {
 
         var server = coap.createServer();
         server.on('request', function(req, res) {
-            var r;
-            try {
+            helper.endTest(done,function(){
                 req.url.should.equal("/test-resource");
-            } catch (e) { r = e; }
-            done(r);
+            });
         });
         server.listen(port);
         helper.load(testNodes, flow);
@@ -511,12 +503,10 @@ describe('CoapRequestNode', function() {
                         //Let's catch the response and compare the payload to the expected result.
                         var coapRequest = helper.getNode("coapRequest");
                         coapRequest.payloadDecodedHandler = function(payload) {
-                            var r;
-                            try {
+                            helper.endTest(done,function(){
                                 Buffer.isBuffer(payload).should.be.false;
                                 should.deepEqual(payload, test.message);
-                            } catch (e) { r = e; }
-                            done(r);
+                            });
                         };
                     });
                 });
@@ -567,12 +557,10 @@ describe('CoapRequestNode', function() {
                 //Let's catch the response and compare the payload to the expected result.
                 var coapRequest = helper.getNode("coapRequest");
                 coapRequest.payloadDecodedHandler = function(payload) {
-                    var r;
-                    try {
+                    helper.endTest(done,function(){
                         Buffer.isBuffer( payload ).should.be.true;
                         payload.toString().should.equal(message);
-                    } catch (e) { r = e; }
-                    done(r);
+                    });
                 };
             });
         });
@@ -620,12 +608,10 @@ describe('CoapRequestNode', function() {
                 //Let's catch the response and compare the payload to the expected result.
                 var coapRequest = helper.getNode("coapRequest");
                 coapRequest.payloadDecodedHandler = function(payload) {
-                    var r;
-                    try {
+                    helper.endTest(done,function(){
                         (typeof payload).should.equal("string");
                         payload.should.equal(message);
-                    } catch (e) { r = e; }
-                    done(r);
+                    });
                 };
             });
         });

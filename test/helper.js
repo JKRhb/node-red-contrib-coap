@@ -117,4 +117,12 @@ module.exports = {
     url: function() { return url; },
 
     nock: nock,
+
+    endTest: function (done, fn) {
+        var r;
+        try {
+            fn();
+        } catch (e) { r = e; }
+        done(r);
+    }
 };
