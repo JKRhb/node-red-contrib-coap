@@ -1,10 +1,10 @@
 var should = require("should");
 var when = require("when");
-var RED = require("../node_modules/node-red/red/red.js");
-var redNodes = require("../node_modules/node-red/red/nodes");
-var flows = require("../node_modules/node-red/red/nodes/flows");
-var credentials = require("../node_modules/node-red/red/nodes/credentials");
-var comms = require("../node_modules/node-red/red/comms.js");
+var RED = require("node-red/red/red.js");
+var redNodes = require("node-red/red/nodes");
+var flows = require("node-red/red/nodes/flows");
+var credentials = require("node-red/red/nodes/credentials");
+var comms = require("node-red/red/comms.js");
 
 var http = require('http');
 var express = require('express');
