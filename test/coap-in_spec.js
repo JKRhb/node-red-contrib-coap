@@ -3,7 +3,7 @@ var should = require("should");
 var coap = require("coap");
 var url = require("url");
 var coapInNode = require("../coap/coap-in.js");
-var functionNode = require("../node_modules/node-red/nodes/core/core/80-function.js");
+var functionNode = require("node-red/nodes/core/core/80-function.js");
 var helper = require("./helper.js");
 
 describe('CoapInNode', function() {

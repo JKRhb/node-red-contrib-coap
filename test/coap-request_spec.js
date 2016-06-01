@@ -3,8 +3,8 @@ var coap = require("coap");
 var url = require("url");
 
 var coapRequestNode = require("../coap/coap-request.js");
-var injectNode = require("../node_modules/node-red/nodes/core/core/20-inject.js");
-var changeNode = require("../node_modules/node-red/nodes/core/logic/15-change.js");
+var injectNode = require("node-red/nodes/core/core/20-inject.js");
+var changeNode = require("node-red/nodes/core/logic/15-change.js");
 
 var should = require("should");
 var helper = require("./helper.js");
