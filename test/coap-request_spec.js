@@ -368,6 +368,9 @@ describe('CoapRequestNode', function() {
     });
 
     describe('Content formats', function() {
+        // Using first experimental identifier, which should not ever map
+        // to a recognized content-format.
+        coap.registerFormat('test/unknown', 65000);
 
         var serializeFormatTests = [
             {
@@ -567,6 +570,59 @@ describe('CoapRequestNode', function() {
                     try {
                         Buffer.isBuffer( payload ).should.be.true;
                         payload.toString().should.equal(message);
+                    } catch (e) { r = e; }
+                    done(r);
+                };
+            });
+        });
+
+        it('should default to string for unknown content format', function(done) {
+            var port = getPort();
+            var flow = [
+                        {
+                            id: "inject",
+                            type: "inject",
+                            name: "inject",
+                            payload: "",
+                            payloadType: "none",
+                            repeat: "",
+                            crontab: "",
+                            once: true,
+                            wires: [["coapRequest"]],
+                        },
+                        {
+                            id: "coapRequest",
+                            type: "coap request",
+                            "content-format": "text/plain",
+                            method: "GET",
+                            name: "coapRequest",
+                            observe: false,
+                            "raw-buffer": false,
+                            url: "coap://localhost:" + port + "/test-resource",
+                        },
+                       ];
+
+            var testNodes = [coapRequestNode, injectNode];
+            var message = "Got it!";
+
+            // let's make a CoAP server to respond to our requests (no matter how silly they are)
+            var server = coap.createServer();
+            server.on('request', function(req, res) {
+                req.url.should.equal("/test-resource");
+                req.method.should.equal("GET");
+                res.setOption('Content-Format', 'test/unknown');
+                res.end(message);
+            });
+            server.listen(port);
+
+            helper.load(testNodes, flow, function() {
+                //Let's catch the response and compare the payload to the expected result.
+                var coapRequest = helper.getNode("coapRequest");
+                coapRequest.payloadDecodedHandler = function(payload) {
+                    var r;
+                    try {
+                        (typeof payload).should.equal("string");
+                        payload.should.equal(message);
                     } catch (e) { r = e; }
                     done(r);
                 };
