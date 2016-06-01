@@ -8,14 +8,14 @@
     "h5.linkformat": "0.0.0"
   },
   "devDependencies": {
-    "express": "^3.17.2",
+    "express": "^4.13.4",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-jshint": "^1.0.0",
     "grunt-simple-mocha": "^0.4.0",
     "mocha": "^2.0.1",
     "node-red": "0.9.1-nocolors",
-    "should": "^4.4.1",
+    "should": "^9.0.0",
     "sinon": "^1.12.2",
     "when": "^3.6.4"
   },
