@@ -14,6 +14,7 @@ var linkFormat = require('h5.linkformat');
 // - should we move the test CoAP server creation to helper.js?
 
 describe('CoapRequestNode', function() {
+    this.slow(300);
     var i;
 
     var lastPort = 8887;
