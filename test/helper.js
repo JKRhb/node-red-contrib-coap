@@ -1,15 +1,5 @@
 var should = require("should");
 var when = require("when");
-var nock;
-if (!process.version.match(/^v0\.[0-9]\./)) {
-    // only set nock for node >= 0.10
-    try {
-        nock = require('nock');
-    } catch (err) {
-        // nevermind, will skip nock tests
-        nock = null;
-    }
-}
 var RED = require("../node_modules/node-red/red/red.js");
 var redNodes = require("../node_modules/node-red/red/nodes");
 var flows = require("../node_modules/node-red/red/nodes/flows");
@@ -115,8 +105,6 @@ module.exports = {
     },
 
     url: function() { return url; },
-
-    nock: nock,
 
     endTest: function (done, fn) {
         var r;
