@@ -79,7 +79,7 @@ module.exports = function(RED) {
                         });
                         onPayloadDecoded(payload);
                     } else if (res.headers['Content-Format'] === 'application/cbor') {
-                        cbor.decode(data, _onCborDecode);
+                        cbor.decodeAll(data, _onCborDecode);
                     } else if (res.headers['Content-Format'] === 'application/link-format') {
                         payload = linkFormat.parse( data.toString() );
                         node.send({

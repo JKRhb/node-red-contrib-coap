@@ -380,11 +380,11 @@ describe('CoapRequestNode', function() {
                 format: 'application/cbor',
                 message: { thisIs: 'CBOR' },
                 decode: function (buf) { return new Promise( function (resolve, reject) {
-                    cbor.decode(buf,function (error, value) {
+                    cbor.decodeFirst(buf,function (error, value) {
                         if ( error ) {
                             reject(error);
                         } else {
-                            resolve(value[0]);
+                            resolve(value);
                         }
                     });
                 }); }
