@@ -64,7 +64,7 @@ module.exports = {
             testNodes[i](RED);
         }
         flows.load().then(function() {
-            should.deepEqual(testFlows, flows.getFlows());
+            testFlows.should.deepEqual(flows.getFlows());
             if ( cb instanceof Function ) {
                 cb();
             }

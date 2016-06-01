@@ -426,7 +426,7 @@ describe('CoapRequestNode', function() {
                             req.method.should.equal("POST");
                             req.headers['Content-Format'].should.equal(test.format);
                             test.decode(req.payload)
-                                .then(function(val){ should.deepEqual(val, test.message); })
+                                .then(function(val){ val.should.deepEqual(test.message); })
                                 .then(done, done); // looks a bit like black magic, but works because the previous line returns `undefined`
                         } catch (e) { done(e); }
                     });
@@ -505,7 +505,7 @@ describe('CoapRequestNode', function() {
                         coapRequest.payloadDecodedHandler = function(payload) {
                             helper.endTest(done,function(){
                                 Buffer.isBuffer(payload).should.be.false;
-                                should.deepEqual(payload, test.message);
+                                payload.should.deepEqual(test.message);
                             });
                         };
                     });
