@@ -14,7 +14,7 @@ module.exports = function(RED) {
 
         // copy "coap request" configuration locally
         node.options = {};
-        node.options.method = (n.method || 'GET').toUpperCase();
+        node.options.method = n.method;
         node.options.observe = n.observe;
         node.options.name = n.name;
         node.options.url = n.url;
@@ -54,8 +54,8 @@ module.exports = function(RED) {
         }
 
         function _makeRequest(msg) {
-            var reqOpts = url.parse(node.options.url);
-            reqOpts.method = node.options.method;
+            var reqOpts = url.parse(node.options.url || msg.url);
+            reqOpts.method = ( node.options.method || msg.method || 'GET' ).toUpperCase();
             reqOpts.headers = {};
             reqOpts.headers['Content-Format'] = node.options.contentFormat;
             function _onResponse(res) {
