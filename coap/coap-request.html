@@ -12,6 +12,7 @@
             observe: {value:false, required:true},
             url: {value:"", required:true},
             'content-format': {value: "text/plain", required:true},
+            'raw-buffer': {value: false, required:true},
             name: {value:""}
         },
         inputs:1,
@@ -43,9 +44,11 @@
     </div>
     <div class="form-row">
         <!-- Empty label for alignment -->
-        <label/> 
+        <label/>
         <input id="node-input-observe" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;"/>
-        <label for="node-input-observe">Observe?</label>
+        <label for="node-input-observe" style="width: auto; margin-right: 1em;">Observe?</label>
+        <input id="node-input-raw-buffer" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;"/>
+        <label for="node-input-raw-buffer" style="width: auto; margin-right: 1em;">Raw buffer?</label>
     </div>
     <div class="form-row">
         <label for="node-input-content-format"><i class="fa fa-file"></i> Content format</label>
