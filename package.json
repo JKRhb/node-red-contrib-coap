@@ -21,7 +21,7 @@
   "license": "Apache",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gatesense/node-red-contrib-coap.git"
+    "url": "https://github.com/reederz/node-red-contrib-coap.git"
   },
   "keywords": [
     "node-red",
