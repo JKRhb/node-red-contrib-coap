@@ -18,7 +18,7 @@
     "sinon": "1.12.2",
     "when": "3.6.4"
   },
-  "license": "Apache",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/reederz/node-red-contrib-coap.git"
