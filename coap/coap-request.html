@@ -35,11 +35,11 @@
     <div class="form-row">
         <label for="node-input-method"><i class="fa fa-tasks"></i> Method</label>
         <select id="node-input-method">
+          <option value=""></option>
           <option value="GET">GET</option>
           <option value="PUT">PUT</option>
           <option value="POST">POST</option>
           <option value="DELETE">DELETE</option>
-          <option value="">- set by msg.method -</option>
         </select>
     </div>
     <div class="form-row">
@@ -61,6 +61,9 @@
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="foobar"/>
+    </div>
+    <div class="form-tips">
+        Tip: Leave url or method blank if you want to set them via msg properties.
     </div>
 </script>
 
