@@ -1,20 +1,10 @@
 var should = require("should");
 var when = require("when");
-var nock;
-if (!process.version.match(/^v0\.[0-9]\./)) {
-    // only set nock for node >= 0.10
-    try {
-        nock = require('nock');
-    } catch (err) {
-        // nevermind, will skip nock tests
-        nock = null;
-    }
-}
-var RED = require("../node_modules/node-red/red/red.js");
-var redNodes = require("../node_modules/node-red/red/nodes");
-var flows = require("../node_modules/node-red/red/nodes/flows");
-var credentials = require("../node_modules/node-red/red/nodes/credentials");
-var comms = require("../node_modules/node-red/red/comms.js");
+var RED = require("node-red/red/red.js");
+var redNodes = require("node-red/red/nodes");
+var flows = require("node-red/red/nodes/flows");
+var credentials = require("node-red/red/nodes/credentials");
+var comms = require("node-red/red/comms.js");
 
 var http = require('http');
 var express = require('express');
@@ -27,13 +17,20 @@ var url;
 
 var server;
 
+// Node-RED writes to the console using `util.log`
+// Replacing this function by a no-op makes tests output much more readable.
+try {
+	var util = require('util');
+	util.log = function(){};
+} catch (e) {}
+
 function helperNode(n) {
     RED.nodes.createNode(this, n);
 }
 
 module.exports = {
     load: function(testNodes, testFlows, testCredentials, cb) {
-        if (typeof testCredentials === 'function') {
+        if (typeof testCredentials !== 'object') {
             cb = testCredentials;
             testCredentials = {};
         }
@@ -67,8 +64,10 @@ module.exports = {
             testNodes[i](RED);
         }
         flows.load().then(function() {
-            should.deepEqual(testFlows, flows.getFlows());
-            cb();
+            testFlows.should.deepEqual(flows.getFlows());
+            if ( cb instanceof Function ) {
+                cb();
+            }
         });
     },
     unload: function() {
@@ -107,5 +106,11 @@ module.exports = {
 
     url: function() { return url; },
 
-    nock: nock,
+    endTest: function (done, fn) {
+        var r;
+        try {
+            fn();
+        } catch (e) { r = e; }
+        done(r);
+    }
 };

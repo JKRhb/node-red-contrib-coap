@@ -3,16 +3,25 @@ var coap = require("coap");
 var url = require("url");
 
 var coapRequestNode = require("../coap/coap-request.js");
-var injectNode = require("../node_modules/node-red/nodes/core/core/20-inject.js");
+var injectNode = require("node-red/nodes/core/core/20-inject.js");
+var changeNode = require("node-red/nodes/core/logic/15-change.js");
 
 var should = require("should");
 var helper = require("./helper.js");
-
+var linkFormat = require('h5.linkformat');
 
 // TODO:
 // - should we move the test CoAP server creation to helper.js?
 
 describe('CoapRequestNode', function() {
+    this.slow(300);
+    var i;
+
+    var lastPort = 8887;
+    function getPort() {
+        return ++lastPort;
+    }
+
     beforeEach(function(done) {
         helper.startServer(done);
     });
@@ -46,172 +55,204 @@ describe('CoapRequestNode', function() {
         });
     });
 
-    it('should be able to make GET, PUT, POST & DELETE requests', function(done) {
-        // create flow: inject (fire immediately), coap request,
+    describe('Methods', function() {
 
-        // The flow:
-        // - 4 periodical "inject" nodes with periods of 1, 2, 3 & 4 seconds respectively
-        // - 4 "coap request" nodes which get triggered by their respective "inject" nodes
+        var methodTests = [
+            { method: 'GET',    message: 'You get me, buddy' },
+            { method: 'PUT',    message: 'This resource sucks–need to change it' },
+            { method: 'POST',   message: 'Welcome aboard!' },
+            { method: 'DELETE', message: 'Erase and rewind…' }
+        ];
+
+        for ( i = 0; i < methodTests.length; ++i ) {
+            ( function ( test ) {
+                it('should be able to make ' + test.method + ' requests', function(done) {
+                    var port = getPort();
+                    var flow = [
+                                {
+                                    id: "inject",
+                                    type: "inject",
+                                    name: "inject",
+                                    payload: "",
+                                    payloadType: "none",
+                                    repeat: "",
+                                    crontab: "",
+                                    once: true,
+                                    wires: [["coapRequest"]],
+                                },
+                                {
+                                    id: "coapRequest",
+                                    type: "coap request",
+                                    "content-format": "text/plain",
+                                    method: test.method,
+                                    name: "coapRequest",
+                                    observe: false,
+                                    url: "coap://localhost:" + port + "/test-resource",
+                                },
+                               ];
+
+                    var testNodes = [coapRequestNode, injectNode];
+
+                    // let's make a CoAP server to respond to our requests (no matter how silly they are)
+                    var server = coap.createServer();
+                    server.on('request', function(req, res) {
+                        res.setOption('Content-Format', 'text/plain');
+                        req.url.should.equal("/test-resource");
+                        req.method.should.equal(test.method);
+                        res.end(test.message);
+                    });
+                    server.listen(port);
+
+                    helper.load(testNodes, flow, function() {
+                        //Let's catch the response and compare the payload to the expected result.
+                        var coapRequest = helper.getNode("coapRequest");
+                        coapRequest.payloadDecodedHandler = function(payload) {
+                            helper.endTest(done,function(){
+                                payload.toString().should.equal(test.message);
+                            });
+                        };
+                    });
+                });
+            } ) ( methodTests[i] );
+        }
+
+        it('should use msg.method', function(done) {
+            var port = getPort();
+            var flow = [
+                        {
+                            id: "inject",
+                            type: "inject",
+                            name: "inject",
+                            payload: "",
+                            payloadType: "none",
+                            repeat: "",
+                            crontab: "",
+                            once: true,
+                            wires: [["setMethod"]],
+                        },
+                        {
+                            id: "setMethod",
+                            type: "change",
+                            action: "replace",
+                            property: "method",
+                            from: "",
+                            to: "PUT",
+                            reg: false,
+                            name: "set method",
+                            wires: [["coapRequest"]]
+                        },
+                        {
+                            id: "coapRequest",
+                            type: "coap request",
+                            "content-format": "text/plain",
+                            method: "",
+                            name: "coapRequest",
+                            observe: false,
+                            url: "coap://localhost:" + port + "/test-resource",
+                        },
+                       ];
+
+            var testNodes = [coapRequestNode, injectNode, changeNode];
+
+            var server = coap.createServer();
+            server.on('request', function(req, res) {
+                helper.endTest(done,function(){
+                    req.method.should.equal("PUT");
+                });
+            });
+            server.listen(port);
+            helper.load(testNodes, flow);
+        });
+
+        it('should default to GET if no method is configured', function(done) {
+            var port = getPort();
+            var flow = [
+                        {
+                            id: "inject",
+                            type: "inject",
+                            name: "inject",
+                            payload: "",
+                            payloadType: "none",
+                            repeat: "",
+                            crontab: "",
+                            once: true,
+                            wires: [["coapRequest"]],
+                        },
+                        {
+                            id: "coapRequest",
+                            type: "coap request",
+                            "content-format": "text/plain",
+                            method: "",
+                            name: "coapRequest",
+                            observe: false,
+                            url: "coap://localhost:" + port + "/test-resource",
+                        },
+                       ];
+
+            var testNodes = [coapRequestNode, injectNode];
+
+            var server = coap.createServer();
+            server.on('request', function(req, res) {
+                helper.endTest(done,function(){
+                    req.method.should.equal("GET");
+                });
+            });
+            server.listen(port);
+            helper.load(testNodes, flow);
+        });
+
+    });
+
+    it('should use msg.url', function(done) {
+        var port = getPort();
         var flow = [
                     {
-                        id: "inject1",
+                        id: "inject",
                         type: "inject",
-                        name: "Every 1s (inject)",
+                        name: "inject",
                         payload: "",
                         payloadType: "none",
-                        repeat: "1",
+                        repeat: "",
                         crontab: "",
-                        once: false,
-                        wires: [["coapRequest1"]],
+                        once: true,
+                        wires: [["setUrl"]],
                     },
                     {
-                        id: "coapRequest1",
+                        id: "setUrl",
+                        type: "change",
+                        action: "replace",
+                        property: "url",
+                        from: "",
+                        to: "coap://localhost:" + port + "/test-resource",
+                        reg: false,
+                        name: "set URL",
+                        wires: [["coapRequest"]]
+                    },
+                    {
+                        id: "coapRequest",
                         type: "coap request",
                         "content-format": "text/plain",
                         method: "GET",
-                        name: "coapRequestGet",
+                        name: "coapRequest",
                         observe: false,
-                        url: "coap://localhost:8888/test-resource",
-                    },
-                    {
-                        id: "inject2",
-                        type: "inject",
-                        name: "Every 2s (inject)",
-                        payload: "",
-                        payloadType: "none",
-                        repeat: "2",
-                        crontab: "",
-                        once: false,
-                        wires: [["coapRequest2"]],
-                    },
-                    {
-                        id: "coapRequest2",
-                        type: "coap request",
-                        "content-format": "text/plain",
-                        method: "PUT",
-                        name: "coapRequestPut",
-                        observe: false,
-                        url: "coap://localhost:8888/test-resource",
-                    },
-                    {
-                        id: "inject3",
-                        type: "inject",
-                        name: "Every 3s (inject)",
-                        payload: "",
-                        payloadType: "none",
-                        repeat: "3",
-                        crontab: "",
-                        once: false,
-                        wires: [["coapRequest3"]],
-                    },
-                    {
-                        id: "coapRequest3",
-                        type: "coap request",
-                        "content-format": "text/plain",
-                        method: "POST",
-                        name: "coapRequestPost",
-                        observe: false,
-                        url: "coap://localhost:8888/test-resource",
-                    },
-                    {
-                        id: "inject4",
-                        type: "inject",
-                        name: "Every 4s (inject)",
-                        payload: "",
-                        payloadType: "none",
-                        repeat: "4",
-                        crontab: "",
-                        once: false,
-                        wires: [["coapRequest4"]],
-                    },
-                    {
-                        id: "coapRequest4",
-                        type: "coap request",
-                        "content-format": "text/plain",
-                        method: "DELETE",
-                        name: "coapRequestDelete",
-                        observe: false,
-                        url: "coap://localhost:8888/test-resource",
+                        url: "",
                     },
                    ];
 
+        var testNodes = [coapRequestNode, injectNode, changeNode];
 
-
-        var testNodes = [coapRequestNode, injectNode];
-
-        var messageGet = 'You get me, buddy';
-        var messagePut = 'This resource sucks- need to change it';
-        var messagePost = 'Welcome aboard!';
-        var messageDelete = 'Erase and rewind...';
-
-        // let's make a CoAP server to respond to our requests (no matter how silly they are)
         var server = coap.createServer();
         server.on('request', function(req, res) {
-            res.setOption('Content-Format', 'text/plain');
-            if (req.url == "/test-resource" && req.method == "GET") {
-                res.end(messageGet);
-            }
-            else if (req.url == "/test-resource" && req.method == "PUT") {
-                res.end(messagePut);
-            }
-            else if (req.url == "/test-resource" && req.method == "POST") {
-                res.end(messagePost);
-            }
-            else if (req.url == "/test-resource" && req.method == "DELETE") {
-                res.end(messageDelete);
-            }
+            helper.endTest(done,function(){
+                req.url.should.equal("/test-resource");
+            });
         });
-        server.listen(8888, function() {
-            console.log('Test CoAP Server Started');
-        });
-
-        helper.load(testNodes, flow, function() {
-            //Let's catch the responses and compare the payloads to the expected results.
-            var secondRequestTestingInitiated = false;
-            var thirdRequestTestingInitiated = false;
-            var fourthRequestTestingInitiated = false;
-            function testRequest1StartChain() {
-                var coapRequest1 = helper.getNode("coapRequest1");
-                coapRequest1.payloadDecodedHandler = function(payload) {
-                    payload.toString().should.equal(messageGet);
-                    if (!secondRequestTestingInitiated) {
-                        testRequest2();
-                    }
-                };
-            }
-            function testRequest2() {
-                secondRequestTestingInitiated = true;
-                var coapRequest2 = helper.getNode("coapRequest2");
-                coapRequest2.payloadDecodedHandler = function(payload) {
-                    payload.toString().should.equal(messagePut);
-                    if (!thirdRequestTestingInitiated) {
-                        testRequest3();
-                    }
-                };
-            }
-            function testRequest3() {
-                thirdRequestTestingInitiated = true;
-                var coapRequest3 = helper.getNode("coapRequest3");
-                coapRequest3.payloadDecodedHandler = function(payload) {
-                    payload.toString().should.equal(messagePost);
-                    if (!fourthRequestTestingInitiated) {
-                        testRequest4EndChain();
-                    }
-                };
-            }
-            function testRequest4EndChain() {
-                fourthRequestTestingInitiated = true;
-                var coapRequest4 = helper.getNode("coapRequest4");
-                coapRequest4.payloadDecodedHandler = function(payload) {
-                    payload.toString().should.equal(messageDelete);
-                    done();
-                };
-            }
-            testRequest1StartChain();
-        });
+        server.listen(port);
+        helper.load(testNodes, flow);
     });
 
     it('should get resource updates after making GET request with "Observe" header', function(done) {
+        var port = getPort();
         // The flow:
         // - 2 fire-once inject nodes which are connected to 2 "coap request" nodes
         // - 4 "coap request" GET nodes with "Observe" option enabled which get triggered by their respective "inject" nodes
@@ -234,7 +275,7 @@ describe('CoapRequestNode', function() {
                         method: "GET",
                         name: "coapRequestGetObserve1",
                         observe: true,
-                        url: "coap://localhost:8889/test-resource1",
+                        url: "coap://localhost:" + port + "/test-resource1",
                     },
                     {
                         id: "inject2",
@@ -254,7 +295,7 @@ describe('CoapRequestNode', function() {
                         method: "GET",
                         name: "coapRequestGetObserve2",
                         observe: true,
-                        url: "coap://localhost:8889/test-resource2",
+                        url: "coap://localhost:" + port + "/test-resource2",
                     },
                    ];
 
@@ -267,7 +308,7 @@ describe('CoapRequestNode', function() {
         server.on('request', function(req, res) {
             res.setOption('Content-Format', 'text/plain');
             function response1() {
-                res.write(message1);                                     
+                res.write(message1);
             }
             function response2() {
                 res.write(message2);
@@ -283,17 +324,13 @@ describe('CoapRequestNode', function() {
             else if (req.url == "/test-resource2" && req.method == "GET") {
                 responseFn = response2;
             }
-            var interval = setInterval(responseFn, 1000);
-                                                                                             
-            res.on('finish', function(err) {                                                 
+            var interval = setInterval(responseFn, 10);
+
+            res.on('finish', function(err) {
               clearInterval(interval);
-            });                                                                               
+            });
         });
-                                                                                   
-                                                                                   
-        server.listen(8889, function() {
-            console.log('Test CoAP Server Started');
-        });
+        server.listen(port);
 
         var testNodes = [coapRequestNode, injectNode];
 
@@ -301,173 +338,282 @@ describe('CoapRequestNode', function() {
             var noUpdates1 = 0;
             var noUpdates2 = 0;
             var coapRequest1 = helper.getNode("coapRequest1");
+
+            function testCompletion() {
+                if (noUpdates1 == 3 && noUpdates2 == 3) {
+                    done();
+                }
+            }
+
             coapRequest1.payloadDecodedHandler = function(payload) {
                 payload.toString().should.equal(message1);
                 noUpdates1++;
+                testCompletion();
             };
             var coapRequest2 = helper.getNode("coapRequest2");
             coapRequest2.payloadDecodedHandler = function(payload) {
                 payload.toString().should.equal(message2);
                 noUpdates2++;
+                testCompletion();
             };
-
-            // Check for the number of updates every second- if we reach the target then the test is complete
-            var checkNoUpdatesInterval = setInterval(function() {
-                if (noUpdates1 == 3 && noUpdates2 == 3) {
-                    clearInterval(checkNoUpdatesInterval);
-                    done();
-                }
-            
-            }, 1000);
         });
-    
+
     });
 
-    it('should be able to serialize request payload in a number of formats', function(done) {
+    describe('Content formats', function() {
+        // Using first experimental identifier, which should not ever map
+        // to a recognized content-format.
+        coap.registerFormat('test/unknown', 65000);
 
-        // The flow:
-        // - 3 "inject" nodes which trigger "coap request" nodes
-        // - 3 "coap request" nodes which send content serialized in text/plain, application/json and application/cbor formats respectively.
-        var message1 = 'message1';
-        var message2 = 'message2';
-        var message3 = 'message3';
-        var flow = [
-                    {
-                        id: "inject1",
-                        type: "inject",
-                        name: "Fire once (inject)",
-                        payload: message1,
-                        payloadType: "string",
-                        repeat: "",
-                        crontab: "",
-                        once: true,
-                        wires: [["coapRequest1"]],
-                    },
-                    {
-                        id: "coapRequest1",
-                        type: "coap request",
-                        "content-format": "text/plain",
-                        method: "POST",
-                        name: "coapRequestPost1",
-                        observe: false,
-                        url: "coap://localhost:8890/test-resource",
-                    },
-                    {
-                        id: "inject2",
-                        type: "inject",
-                        name: "Fire once (inject)",
-                        payload: message2,
-                        payloadType: "string",
-                        repeat: "",
-                        crontab: "",
-                        once: true,
-                        wires: [["coapRequest2"]],
-                    },
-                    {
-                        id: "coapRequest2",
-                        type: "coap request",
-                        "content-format": "application/json",
-                        method: "POST",
-                        name: "coapRequestPost2",
-                        observe: false,
-                        url: "coap://localhost:8890/test-resource",
-                    },
-                    {
-                        id: "inject3",
-                        type: "inject",
-                        name: "Fire once (inject)",
-                        payload: message3,
-                        payloadType: "string",
-                        repeat: "",
-                        crontab: "",
-                        once: true,
-                        wires: [["coapRequest3"]],
-                    },
-                    {
-                        id: "coapRequest3",
-                        type: "coap request",
-                        "content-format": "application/cbor",
-                        method: "POST",
-                        name: "coapRequestPost3",
-                        observe: false,
-                        url: "coap://localhost:8890/test-resource",
-                    },
-                   ];
-
-        var server = coap.createServer();
-        server.on('request', function(req, res) {
-            if (req.url !== "/test-resource") {
-                res.code = '4.04';
-                return res.end();
-            } 
-            
-            if (req.method !== "POST") {
-                res.code = '4.05';
-                return res.end();
+        var serializeFormatTests = [
+            {
+                format: 'text/plain',
+                message: 'this is a plain text message.',
+                decode: function (buf) { return Promise.resolve(buf.toString()); }
+            },
+            {
+                format: 'application/json',
+                message: { thisIs: 'JSON' },
+                decode: function (buf) { return Promise.resolve(JSON.parse(buf.toString())); }
+            },
+            {
+                format: 'application/cbor',
+                message: { thisIs: 'CBOR' },
+                decode: function (buf) { return new Promise( function (resolve, reject) {
+                    cbor.decodeFirst(buf,function (error, value) {
+                        if ( error ) {
+                            reject(error);
+                        } else {
+                            resolve(value);
+                        }
+                    });
+                }); }
             }
+        ];
 
-            function respond(res, payload, encode) {
-                res.end(encode('Got: ' + payload));
-            }
+        for ( i = 0; i < serializeFormatTests.length; ++i ) {
+            ( function (test) {
+                it('should be able to serialize `' + test.format + '` request payload', function(done) {
+                    var port = getPort();
 
-            var encode = null;
-            var payload = null;
+                    var flow = [
+                                {
+                                    id: "inject",
+                                    type: "inject",
+                                    name: "Fire once",
+                                    payload: test.message,
+                                    payloadType: "string",
+                                    repeat: "",
+                                    crontab: "",
+                                    once: true,
+                                    wires: [["coapRequest"]],
+                                },
+                                {
+                                    id: "coapRequest",
+                                    type: "coap request",
+                                    "content-format": test.format,
+                                    method: "POST",
+                                    name: "coapRequestPost",
+                                    observe: false,
+                                    url: "coap://localhost:" + port + "/test-resource",
+                                }
+                               ];
 
-            if (req.headers['Content-Format'] === 'text/plain') {
-                res.setOption('Content-Format', 'text/plain');
-                encode = function(payload) { return payload; };
-                payload = req.payload;
-                respond(res, payload, encode);
+                    var server = coap.createServer();
+                    server.on('request', function(req, res) {
+                        try {
+                            req.url.should.equal("/test-resource");
+                            req.method.should.equal("POST");
+                            req.headers['Content-Format'].should.equal(test.format);
+                            test.decode(req.payload)
+                                .then(function(val){ val.should.deepEqual(test.message); })
+                                .then(done, done); // looks a bit like black magic, but works because the previous line returns `undefined`
+                        } catch (e) { done(e); }
+                    });
+                    server.listen(port);
 
-            } else if (req.headers['Content-Format'] === 'application/json') {
-                res.setOption('Content-Format', 'application/json');
-                encode = JSON.stringify;
-                payload = JSON.parse(req.payload);
-                respond(res, payload, encode);
-                
-            } else if(req.headers['Content-Format'] === 'application/cbor') {
-                res.setOption('Content-Format', 'application/cbor');
-                encode = cbor.encode;
-                cbor.decode(req.payload, function(err, payload) {
-                    respond(res, payload[0], encode);
+                    var testNodes = [coapRequestNode, injectNode];
+                    helper.load(testNodes, flow);
                 });
+            } ) (serializeFormatTests[i]);
+        }
+
+        var deserializeFormatTests = [
+            {
+                format: 'text/plain',
+                message: 'this is a plain text message.',
+                encode: function (s) { return s; }
+            },
+            {
+                format: 'application/json',
+                message: { thisIs: 'JSON' },
+                encode: JSON.stringify
+            },
+            {
+                format: 'application/cbor',
+                message: { thisIs: 'CBOR' },
+                encode: cbor.encode
+            },
+            {
+                format: 'application/link-format',
+                message: linkFormat.parse('</r1>;if=foo;rt=bar,</r2>;if=foo;rt=baz;obs'),
+                encode: function (lf) { return lf.toString(); }
             }
+        ];
+
+        for ( i = 0; i < deserializeFormatTests.length; ++i ) {
+            ( function (test) {
+                it('should be able to deserialize `' + test.format + '` response payload', function(done) {
+                    var port = getPort();
+
+                    var flow = [
+                                {
+                                    id: "inject",
+                                    type: "inject",
+                                    name: "Fire once",
+                                    payload: "",
+                                    payloadType: "none",
+                                    repeat: "",
+                                    crontab: "",
+                                    once: true,
+                                    wires: [["coapRequest"]],
+                                },
+                                {
+                                    id: "coapRequest",
+                                    type: "coap request",
+                                    "content-format": test.format,
+                                    method: "GET",
+                                    name: "coapRequestGet",
+                                    observe: false,
+                                    url: "coap://localhost:" + port + "/test-resource",
+                                }
+                               ];
+
+                    var server = coap.createServer();
+                    server.on('request', function(req, res) {
+                        req.url.should.equal("/test-resource");
+                        req.method.should.equal("GET");
+                        res.setOption('Content-Format', test.format);
+                        res.end(test.encode(test.message));
+                    });
+                    server.listen(port);
+
+                    var testNodes = [coapRequestNode, injectNode];
+                    helper.load(testNodes, flow, function() {
+                        //Let's catch the response and compare the payload to the expected result.
+                        var coapRequest = helper.getNode("coapRequest");
+                        coapRequest.payloadDecodedHandler = function(payload) {
+                            helper.endTest(done,function(){
+                                Buffer.isBuffer(payload).should.be.false;
+                                payload.should.deepEqual(test.message);
+                            });
+                        };
+                    });
+                });
+            } ) (deserializeFormatTests[i]);
+        }
+
+        it('should return raw buffer if configured to', function(done) {
+            var port = getPort();
+            var flow = [
+                        {
+                            id: "inject",
+                            type: "inject",
+                            name: "inject",
+                            payload: "",
+                            payloadType: "none",
+                            repeat: "",
+                            crontab: "",
+                            once: true,
+                            wires: [["coapRequest"]],
+                        },
+                        {
+                            id: "coapRequest",
+                            type: "coap request",
+                            "content-format": "text/plain",
+                            method: "GET",
+                            name: "coapRequest",
+                            observe: false,
+                            "raw-buffer": true,
+                            url: "coap://localhost:" + port + "/test-resource",
+                        },
+                       ];
+
+            var testNodes = [coapRequestNode, injectNode];
+            var message = "Got it!";
+
+            // let's make a CoAP server to respond to our requests (no matter how silly they are)
+            var server = coap.createServer();
+            server.on('request', function(req, res) {
+                req.url.should.equal("/test-resource");
+                req.method.should.equal("GET");
+
+                res.setOption('Content-Format', 'text/plain');
+                res.end(message);
+            });
+            server.listen(port);
+
+            helper.load(testNodes, flow, function() {
+                //Let's catch the response and compare the payload to the expected result.
+                var coapRequest = helper.getNode("coapRequest");
+                coapRequest.payloadDecodedHandler = function(payload) {
+                    helper.endTest(done,function(){
+                        Buffer.isBuffer( payload ).should.be.true;
+                        payload.toString().should.equal(message);
+                    });
+                };
+            });
         });
-        server.listen(8890, function() {
-            console.log('Test CoAP Server Started');
-        });
 
-        var testNodes = [coapRequestNode, injectNode];
-        helper.load(testNodes, flow, function() {
-            var correctResponses1 = 0;
-            var correctResponses2 = 0;
-            var correctResponses3 = 0;
+        it('should default to string for unknown content format', function(done) {
+            var port = getPort();
+            var flow = [
+                        {
+                            id: "inject",
+                            type: "inject",
+                            name: "inject",
+                            payload: "",
+                            payloadType: "none",
+                            repeat: "",
+                            crontab: "",
+                            once: true,
+                            wires: [["coapRequest"]],
+                        },
+                        {
+                            id: "coapRequest",
+                            type: "coap request",
+                            "content-format": "text/plain",
+                            method: "GET",
+                            name: "coapRequest",
+                            observe: false,
+                            "raw-buffer": false,
+                            url: "coap://localhost:" + port + "/test-resource",
+                        },
+                       ];
 
-            var coapRequest1 = helper.getNode("coapRequest1");
-            coapRequest1.payloadDecodedHandler = function(payload) {
-                payload.toString().should.equal('Got: ' + message1);
-                correctResponses1++;
-            };
-            var coapRequest2 = helper.getNode("coapRequest2");
-            coapRequest2.payloadDecodedHandler = function(payload) {
-                payload.toString().should.equal('Got: ' + message2);
-                correctResponses2++;
-            };
-            var coapRequest3 = helper.getNode("coapRequest3");
-            coapRequest3.payloadDecodedHandler = function(payload) {
-                payload.toString().should.equal('Got: ' + message3);
-                correctResponses3++;
-            };
+            var testNodes = [coapRequestNode, injectNode];
+            var message = "Got it!";
 
-            var checkInterval = setInterval(function() {
-                if (correctResponses1 == 1 && 
-                    correctResponses2 == 1 && 
-                    correctResponses3 == 1
-                   ) {
-                    clearInterval(checkInterval);
-                    done(); 
-                }
-            }, 1000);
+            // let's make a CoAP server to respond to our requests (no matter how silly they are)
+            var server = coap.createServer();
+            server.on('request', function(req, res) {
+                req.url.should.equal("/test-resource");
+                req.method.should.equal("GET");
+                res.setOption('Content-Format', 'test/unknown');
+                res.end(message);
+            });
+            server.listen(port);
+
+            helper.load(testNodes, flow, function() {
+                //Let's catch the response and compare the payload to the expected result.
+                var coapRequest = helper.getNode("coapRequest");
+                coapRequest.payloadDecodedHandler = function(payload) {
+                    helper.endTest(done,function(){
+                        (typeof payload).should.equal("string");
+                        payload.should.equal(message);
+                    });
+                };
+            });
         });
     });
 });

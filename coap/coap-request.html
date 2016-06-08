@@ -5,13 +5,13 @@
         defaults: {
             method: {
               value:"GET",
-              required:true,
               validate:
-                function(v){return v == "GET" || v == "PUT" || v == "POST" || v == "DELETE";} 
+                function(v){return [ "", "GET", "PUT", "POST", "DELETE" ].indexOf(v) !== -1;}
             },
             observe: {value:false, required:true},
-            url: {value:"", required:true},
-            'content-format': {value: "text/plain", required:true},
+            url: {value:""},
+            'content-format': {value: "text/plain"},
+            'raw-buffer': {value: false, required:true},
             name: {value:""}
         },
         inputs:1,
@@ -35,6 +35,7 @@
     <div class="form-row">
         <label for="node-input-method"><i class="fa fa-tasks"></i> Method</label>
         <select id="node-input-method">
+          <option value=""></option>
           <option value="GET">GET</option>
           <option value="PUT">PUT</option>
           <option value="POST">POST</option>
@@ -43,9 +44,11 @@
     </div>
     <div class="form-row">
         <!-- Empty label for alignment -->
-        <label/> 
+        <label/>
         <input id="node-input-observe" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;"/>
-        <label for="node-input-observe">Observe?</label>
+        <label for="node-input-observe" style="width: auto; margin-right: 1em;">Observe?</label>
+        <input id="node-input-raw-buffer" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;"/>
+        <label for="node-input-raw-buffer" style="width: auto; margin-right: 1em;">Raw buffer?</label>
     </div>
     <div class="form-row">
         <label for="node-input-content-format"><i class="fa fa-file"></i> Content format</label>
@@ -59,6 +62,9 @@
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="foobar"/>
     </div>
+    <div class="form-tips">
+        Tip: Leave url or method blank if you want to set them via msg properties.
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="coap request">
@@ -66,5 +72,11 @@
 
     <p>URL, request method and content serialization format (<i>Content-Format</i>) can be configured. Also, you can add <i>Observe</i> header to your request. If the target endpoint supports <i>pub/sub</i>, you will get updated resource represantations in addition to the initial one (<a href="http://tools.ietf.org/html/draft-ietf-core-observe-11">draft-ietf-core-observe-11</a>)</p>
 
-    <p><code>msg.payload</code> can be configured by the input node of <i>coap request</i>. It will be serialized using the format specified in the <i>Content-Format</i> variable.</p>
+    <p>The following properties may be set on the message object:</p>
+
+    <ul>
+        <li><code>payload</code> will be sent in the body of the request. It will be serialized using the format specified in the <i>Content-Format</i> variable.</li>
+        <li><code>method</code> will be used the node is configured to use it. Defaults to <code>GET</code></li>
+        <li><code>url</code> will be used if no URL is configured.</li>
+    </ul>
 </script>

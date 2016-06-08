@@ -3,7 +3,7 @@ var should = require("should");
 var coap = require("coap");
 var url = require("url");
 var coapInNode = require("../coap/coap-in.js");
-var functionNode = require("../node_modules/node-red/nodes/core/core/80-function.js");
+var functionNode = require("node-red/nodes/core/core/80-function.js");
 var helper = require("./helper.js");
 
 describe('CoapInNode', function() {
@@ -47,141 +47,123 @@ describe('CoapInNode', function() {
         });
     });
 
-    it('should accept GET, PUT, POST & DELETE requests', function(done) {
-        var messageGet = 'You get me, buddy';
-        var messagePut = 'This resource sucks- need to change it';
-        var messagePost = 'Welcome aboard!';
-        var messageDelete = 'Erase and rewind...';
-
-        // The flow:
-        // - single coap server
-        // - 4 coap in nodes which represent a single resource (/test) and react to different CoAP verbs (GET, PUT, POST, DELETE)
-        // - 4 function nodes which respond to requests which come through coap in nodes (act as our coap out nodes).
+    it('should return 4.04 for unregistered paths', function(done) {
         var flow = [
                     {
-                        id:"coapServer1",
+                        id:"coapServer",
                         type:"coap-server",
                         name:"coapServer",
                         port:8888
-                    },
-                    {
-                        id:"coapIn1",
-                        type:"coap in",
-                        method:"GET",
-                        name:"coapInGet",
-                        url:"/test",
-                        server:"coapServer1",
-                        wires:[["coapOut1"]]
-                    },
-                    {
-                        id:"coapIn2",
-                        type:"coap in",
-                        method:"PUT",
-                        name:"coapInPut",
-                        url:"/test",
-                        server:"coapServer1",
-                        wires:[["coapOut2"]]
-                    },
-                    {
-                        id:"coapIn3",
-                        type:"coap in",
-                        method:"POST",
-                        name:"coapInPost",
-                        url:"/test",
-                        server:"coapServer1",
-                        wires:[["coapOut3"]]
-                    },
-                    {
-                        id:"coapIn4",
-                        type:"coap in",
-                        method:"DELETE",
-                        name:"coapInDelete",
-                        url:"/test",
-                        server:"coapServer1",
-                        wires:[["coapOut4"]]
-                    },
-                    {
-                        id:'coapOut1',
-                        type:"function",
-                        name:"coapOutGet",
-                        func:"msg.res.end('"+ messageGet +"');\nreturn msg;",
-                        wires:[]
-                    },
-                    {
-                        id:'coapOut2',
-                        type:"function",
-                        name:"coapOutPut",
-                        func:"msg.res.end('"+ messagePut +"');\nreturn msg;",
-                        wires:[]
-                    },
-                    {
-                        id:'coapOut3',
-                        type:"function",
-                        name:"coapOutPost",
-                        func:"msg.res.end('"+ messagePost +"');\nreturn msg;",
-                        wires:[]
-                    },
-                    {
-                        id:'coapOut4',
-                        type:"function",
-                        name:"coapOutDelete",
-                        func:"msg.res.end('"+ messageDelete +"');\nreturn msg;",
-                        wires:[]
-                    },
+                    }
                    ];
 
-        //need to register nodes in order to use them
+        // Need to register nodes in order to use them
         var testNodes = [functionNode, coapInNode];
         helper.load(testNodes, flow, function() {
+            var urlStr = "coap://localhost:8888/unregistered";
+            var opts = url.parse(urlStr);
+            opts.method = 'GET';
+            var req = coap.request(opts);
 
-            // Encapsulating callbacks to avoid too much nesting
-            function testRequest1StartChain() {
-                var req   = coap.request('coap://localhost:8888/test');
-
-                req.on('response', function(res) {
-                    res.payload.toString().should.equal(messageGet);
-                    testRequest2();
+            req.on('response', function(res) {
+                helper.endTest(done,function(){
+                    res.code.should.equal('4.04');
                 });
-                req.end();
-            }
-            function testRequest2() {
+            });
+            req.end();
+        });
+    });
+
+    describe('Methods', function() {
+
+        var methodTests = [
+            { method: 'GET',    message: 'You get me, buddy' },
+            { method: 'PUT',    message: 'This resource sucks–need to change it' },
+            { method: 'POST',   message: 'Welcome aboard!' },
+            { method: 'DELETE', message: 'Erase and rewind…' }
+        ];
+
+        for ( i = 0; i < methodTests.length; ++i ) {
+            ( function ( test ) {
+                it('should accept ' + test.method + ' requests', function(done) {
+                    var flow = [
+                                {
+                                    id:"coapServer",
+                                    type:"coap-server",
+                                    name:"coapServer",
+                                    port:8888
+                                },
+                                {
+                                    id:"coapIn",
+                                    type:"coap in",
+                                    method:test.method,
+                                    name:"coapIn",
+                                    url:"/test",
+                                    server:"coapServer",
+                                    wires:[["coapOut"]]
+                                },
+                                {
+                                    id:'coapOut',
+                                    type:"function",
+                                    name:"coapOutGet",
+                                    func:"msg.res.end('"+ test.message +"');\nreturn msg;",
+                                    wires:[]
+                                }
+                               ];
+
+                    // Need to register nodes in order to use them
+                    var testNodes = [functionNode, coapInNode];
+                    helper.load(testNodes, flow, function() {
+                        var urlStr = "coap://localhost:8888/test";
+                        var opts = url.parse(urlStr);
+                        opts.method = test.method;
+                        var req = coap.request(opts);
+
+                        req.on('response', function(res) {
+                            helper.endTest(done,function(){
+                                res.payload.toString().should.equal(test.message);
+                            });
+                        });
+                        req.end();
+                    });
+                });
+            } ) ( methodTests[i] );
+        }
+
+        it('should return 4.05 for unregistered methods', function(done) {
+            var flow = [
+                        {
+                            id:"coapServer",
+                            type:"coap-server",
+                            name:"coapServer",
+                            port:8888
+                        },
+                        {
+                            id:"coapIn",
+                            type:"coap in",
+                            method: 'GET',
+                            name:"coapIn",
+                            url:"/test",
+                            server:"coapServer",
+                            wires:[["coapOut"]]
+                        }
+                       ];
+
+            // Need to register nodes in order to use them
+            var testNodes = [functionNode, coapInNode];
+            helper.load(testNodes, flow, function() {
                 var urlStr = "coap://localhost:8888/test";
                 var opts = url.parse(urlStr);
-                opts.method = "PUT";
+                opts.method = 'PUT';
                 var req = coap.request(opts);
 
                 req.on('response', function(res) {
-                    res.payload.toString().should.equal(messagePut);
-                    testRequest3();
+                    helper.endTest(done,function(){
+                        res.code.should.equal('4.05');
+                    });
                 });
                 req.end();
-            }
-            function testRequest3() {
-                var urlStr = "coap://localhost:8888/test";
-                var opts = url.parse(urlStr);
-                opts.method = "POST";
-                var req = coap.request(opts);
-
-                req.on('response', function(res) {
-                    res.payload.toString().should.equal(messagePost);
-                    testRequest4EndChain();
-                });
-                req.end();
-            }
-            function testRequest4EndChain() {
-                var urlStr = "coap://localhost:8888/test";
-                var opts = url.parse(urlStr);
-                opts.method = "DELETE";
-                var req = coap.request(opts);
-
-                req.on('response', function(res) {
-                    res.payload.toString().should.equal(messageDelete);
-                    done();
-                });
-                req.end();
-            }
-
-            testRequest1StartChain();
+            });
         });
     });
 });
