@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-coap",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "CoAP support in Node-RED",
   "dependencies": {
     "cbor": "^1.0.4",
@@ -45,6 +45,9 @@
   "contributors": [
     {
       "name": "Eelco Wiersma"
+    },
+    {
+      "name": "Lucien Guimier"
     },
     {
       "name": "Justas Azna"
