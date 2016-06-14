@@ -64,8 +64,8 @@ describe('CoapRequestNode', function() {
             { method: 'DELETE', message: 'Erase and rewind…' }
         ];
 
-        for ( i = 0; i < methodTests.length; ++i ) {
-            ( function ( test ) {
+        for (i = 0; i < methodTests.length; ++i) {
+            (function(test) {
                 it('should be able to make ' + test.method + ' requests', function(done) {
                     var port = getPort();
                     var flow = [
@@ -114,7 +114,7 @@ describe('CoapRequestNode', function() {
 
                     helper.load(testNodes, flow);
                 });
-            } ) ( methodTests[i] );
+            }) (methodTests[i]);
         }
 
         it('should use msg.method', function(done) {
@@ -390,19 +390,19 @@ describe('CoapRequestNode', function() {
             {
                 format: 'text/plain',
                 message: 'this is a plain text message.',
-                decode: function (buf) { return Promise.resolve(buf.toString()); }
+                decode: function(buf) { return Promise.resolve(buf.toString()); }
             },
             {
                 format: 'application/json',
                 message: { thisIs: 'JSON' },
-                decode: function (buf) { return Promise.resolve(JSON.parse(buf.toString())); }
+                decode: function(buf) { return Promise.resolve(JSON.parse(buf.toString())); }
             },
             {
                 format: 'application/cbor',
                 message: { thisIs: 'CBOR' },
-                decode: function (buf) { return new Promise( function (resolve, reject) {
-                    cbor.decodeFirst(buf,function (error, value) {
-                        if ( error ) {
+                decode: function(buf) { return new Promise(function(resolve, reject) {
+                    cbor.decodeFirst(buf, function(error, value) {
+                        if (error) {
                             reject(error);
                         } else {
                             resolve(value);
@@ -412,8 +412,8 @@ describe('CoapRequestNode', function() {
             }
         ];
 
-        for ( i = 0; i < serializeFormatTests.length; ++i ) {
-            ( function (test) {
+        for (i = 0; i < serializeFormatTests.length; ++i) {
+            (function(test) {
                 it('should be able to serialize `' + test.format + '` request payload', function(done) {
                     var port = getPort();
 
@@ -456,14 +456,14 @@ describe('CoapRequestNode', function() {
                     var testNodes = [coapRequestNode, injectNode];
                     helper.load(testNodes, flow);
                 });
-            } ) (serializeFormatTests[i]);
+            }) (serializeFormatTests[i]);
         }
 
         var deserializeFormatTests = [
             {
                 format: 'text/plain',
                 message: 'this is a plain text message.',
-                encode: function (s) { return s; }
+                encode: function(s) { return s; }
             },
             {
                 format: 'application/json',
@@ -478,12 +478,12 @@ describe('CoapRequestNode', function() {
             {
                 format: 'application/link-format',
                 message: linkFormat.parse('</r1>;if=foo;rt=bar,</r2>;if=foo;rt=baz;obs'),
-                encode: function (lf) { return lf.toString(); }
+                encode: function(lf) { return lf.toString(); }
             }
         ];
 
-        for ( i = 0; i < deserializeFormatTests.length; ++i ) {
-            ( function (test) {
+        for (i = 0; i < deserializeFormatTests.length; ++i) {
+            (function(test) {
                 it('should be able to deserialize `' + test.format + '` response payload', function(done) {
                     var port = getPort();
 
@@ -533,7 +533,7 @@ describe('CoapRequestNode', function() {
                     var testNodes = [coapRequestNode, injectNode, endTestNode];
                     helper.load(testNodes, flow);
                 });
-            } ) (deserializeFormatTests[i]);
+            }) (deserializeFormatTests[i]);
         }
 
         it('should return raw buffer if configured to', function(done) {
