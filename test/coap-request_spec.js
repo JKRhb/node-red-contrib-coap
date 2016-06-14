@@ -165,6 +165,62 @@ describe('CoapRequestNode', function() {
             helper.load(testNodes, flow);
         });
 
+        it('should preserve message properties', function(done) {
+            var port = getPort();
+            var flow = [
+                        {
+                            id: "inject",
+                            type: "inject",
+                            name: "inject",
+                            payload: "",
+                            payloadType: "none",
+                            repeat: "",
+                            crontab: "",
+                            once: true,
+                            wires: [["setRandomProperty"]],
+                        },
+                        {
+                            id: "setRandomProperty",
+                            type: "change",
+                            action: "replace",
+                            property: "random_property",
+                            from: "",
+                            to: "I will survive",
+                            reg: false,
+                            name: "set random_property",
+                            wires: [["coapRequest"]]
+                        },
+                        {
+                            id: "coapRequest",
+                            type: "coap request",
+                            "content-format": "text/plain",
+                            method: "",
+                            name: "coapRequest",
+                            observe: false,
+                            url: "coap://localhost:" + port + "/test-resource",
+                            wires: [["readRandomProperty"]]
+                        },
+                        {
+                            id: "readRandomProperty",
+                            type: "end-test-node",
+                            name: "read random_property",
+                        },
+                       ];
+
+            var endTestNode = helper.endTestNode(done, function(msg) {
+                should(msg.random_property).equal("I will survive");
+            });
+
+            var testNodes = [coapRequestNode, injectNode, changeNode, endTestNode];
+
+            var server = coap.createServer();
+            server.on('request', function(req, res) {
+                res.end('anything');
+            });
+            server.listen(port);
+            helper.load(testNodes, flow);
+        });
+
         it('should default to GET if no method is configured', function(done) {
             var port = getPort();
             var flow = [
