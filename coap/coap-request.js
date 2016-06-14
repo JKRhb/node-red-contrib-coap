@@ -35,13 +35,6 @@ module.exports = function(RED) {
             return payload;
         }
 
-        // this is for testing purposes- payloadDecodedHandler should be set by test code to inspect the payload
-        node.payloadDecodedHandler = function(payload) {};
-
-        function onPayloadDecoded(payload) { 
-            node.payloadDecodedHandler(payload);
-        }
-
         function _onCborDecode(err, data) {
             if (err) {
                 return false;
@@ -50,7 +43,6 @@ module.exports = function(RED) {
             node.send({
                 payload: payload,
             });
-            onPayloadDecoded(payload);
         }
 
         function _makeRequest(msg) {
@@ -58,6 +50,7 @@ module.exports = function(RED) {
             reqOpts.method = ( node.options.method || msg.method || 'GET' ).toUpperCase();
             reqOpts.headers = {};
             reqOpts.headers['Content-Format'] = node.options.contentFormat;
+
             function _onResponse(res) {
                 function _onResponseData(data) {
                     var payload = null;
@@ -65,19 +58,16 @@ module.exports = function(RED) {
                         node.send({
                             payload: data,
                         });
-                        onPayloadDecoded(data);
                     } else if (res.headers['Content-Format'] === 'text/plain') {
                         payload = data.toString();
                         node.send({
                             payload: payload,
                         });
-                        onPayloadDecoded(payload);
                     } else if (res.headers['Content-Format'] === 'application/json') {
                         payload = JSON.parse(data.toString());
                         node.send({
                             payload: payload,
                         });
-                        onPayloadDecoded(payload);
                     } else if (res.headers['Content-Format'] === 'application/cbor') {
                         cbor.decodeAll(data, _onCborDecode);
                     } else if (res.headers['Content-Format'] === 'application/link-format') {
@@ -85,12 +75,10 @@ module.exports = function(RED) {
                         node.send({
                             payload: payload,
                         });
-                        onPayloadDecoded(payload);
                     } else {
                         node.send({
                             payload: data.toString(),
                         });
-                        onPayloadDecoded(data.toString());
                     }
                 }
 

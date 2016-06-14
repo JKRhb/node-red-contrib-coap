@@ -112,5 +112,18 @@ module.exports = {
             fn();
         } catch (e) { r = e; }
         done(r);
-    }
+    },
+
+    endTestNode: function(done, fn) {
+        return function endNode(RED) {
+            function EndTestNode(n) {
+                RED.nodes.createNode(this, n);
+                this.on('input', function(msg) {
+                    module.exports.endTest(done, fn.bind(null, msg));
+                });
+            }
+
+            RED.nodes.registerType("end-test-node", EndTestNode);
+        };
+    },
 };
