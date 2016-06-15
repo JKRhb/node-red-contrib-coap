@@ -64,8 +64,8 @@ describe('CoapRequestNode', function() {
             { method: 'DELETE', message: 'Erase and rewind…' }
         ];
 
-        for ( i = 0; i < methodTests.length; ++i ) {
-            ( function ( test ) {
+        for (i = 0; i < methodTests.length; ++i) {
+            (function(test) {
                 it('should be able to make ' + test.method + ' requests', function(done) {
                     var port = getPort();
                     var flow = [
@@ -88,10 +88,19 @@ describe('CoapRequestNode', function() {
                                     name: "coapRequest",
                                     observe: false,
                                     url: "coap://localhost:" + port + "/test-resource",
+                                    wires: [["end-test-node"]],
+                                },
+                                {
+                                    id: "end-test-node",
+                                    type: "end-test-node",
+                                    name: "end-test-node",
                                 },
                                ];
 
-                    var testNodes = [coapRequestNode, injectNode];
+                    var endTestNode = helper.endTestNode(done, function(msg) {
+                        msg.payload.toString().should.equal(test.message);
+                    });
+                    var testNodes = [coapRequestNode, injectNode, endTestNode];
 
                     // let's make a CoAP server to respond to our requests (no matter how silly they are)
                     var server = coap.createServer();
@@ -103,17 +112,9 @@ describe('CoapRequestNode', function() {
                     });
                     server.listen(port);
 
-                    helper.load(testNodes, flow, function() {
-                        //Let's catch the response and compare the payload to the expected result.
-                        var coapRequest = helper.getNode("coapRequest");
-                        coapRequest.payloadDecodedHandler = function(payload) {
-                            helper.endTest(done,function(){
-                                payload.toString().should.equal(test.message);
-                            });
-                        };
-                    });
+                    helper.load(testNodes, flow);
                 });
-            } ) ( methodTests[i] );
+            }) (methodTests[i]);
         }
 
         it('should use msg.method', function(done) {
@@ -159,6 +160,62 @@ describe('CoapRequestNode', function() {
                 helper.endTest(done,function(){
                     req.method.should.equal("PUT");
                 });
+            });
+            server.listen(port);
+            helper.load(testNodes, flow);
+        });
+
+        it('should preserve message properties', function(done) {
+            var port = getPort();
+            var flow = [
+                        {
+                            id: "inject",
+                            type: "inject",
+                            name: "inject",
+                            payload: "",
+                            payloadType: "none",
+                            repeat: "",
+                            crontab: "",
+                            once: true,
+                            wires: [["setRandomProperty"]],
+                        },
+                        {
+                            id: "setRandomProperty",
+                            type: "change",
+                            action: "replace",
+                            property: "random_property",
+                            from: "",
+                            to: "I will survive",
+                            reg: false,
+                            name: "set random_property",
+                            wires: [["coapRequest"]]
+                        },
+                        {
+                            id: "coapRequest",
+                            type: "coap request",
+                            "content-format": "text/plain",
+                            method: "",
+                            name: "coapRequest",
+                            observe: false,
+                            url: "coap://localhost:" + port + "/test-resource",
+                            wires: [["readRandomProperty"]]
+                        },
+                        {
+                            id: "readRandomProperty",
+                            type: "end-test-node",
+                            name: "read random_property",
+                        },
+                       ];
+
+            var endTestNode = helper.endTestNode(done, function(msg) {
+                should(msg.random_property).equal("I will survive");
+            });
+
+            var testNodes = [coapRequestNode, injectNode, changeNode, endTestNode];
+
+            var server = coap.createServer();
+            server.on('request', function(req, res) {
+                res.end('anything');
             });
             server.listen(port);
             helper.load(testNodes, flow);
@@ -276,6 +333,12 @@ describe('CoapRequestNode', function() {
                         name: "coapRequestGetObserve1",
                         observe: true,
                         url: "coap://localhost:" + port + "/test-resource1",
+                        wires: [["end-test-node1"]]
+                    },
+                    {
+                        id: "end-test-node1",
+                        type: "end-test-node1",
+                        name: "end-test-node1",
                     },
                     {
                         id: "inject2",
@@ -296,6 +359,12 @@ describe('CoapRequestNode', function() {
                         name: "coapRequestGetObserve2",
                         observe: true,
                         url: "coap://localhost:" + port + "/test-resource2",
+                        wires: [["end-test-node2"]]
+                    },
+                    {
+                        id: "end-test-node2",
+                        type: "end-test-node2",
+                        name: "end-test-node2",
                     },
                    ];
 
@@ -332,12 +401,9 @@ describe('CoapRequestNode', function() {
         });
         server.listen(port);
 
-        var testNodes = [coapRequestNode, injectNode];
-
-        helper.load(testNodes, flow, function() {
+        function endTest(RED) {
             var noUpdates1 = 0;
             var noUpdates2 = 0;
-            var coapRequest1 = helper.getNode("coapRequest1");
 
             function testCompletion() {
                 if (noUpdates1 == 3 && noUpdates2 == 3) {
@@ -345,18 +411,29 @@ describe('CoapRequestNode', function() {
                 }
             }
 
-            coapRequest1.payloadDecodedHandler = function(payload) {
-                payload.toString().should.equal(message1);
-                noUpdates1++;
-                testCompletion();
-            };
-            var coapRequest2 = helper.getNode("coapRequest2");
-            coapRequest2.payloadDecodedHandler = function(payload) {
-                payload.toString().should.equal(message2);
-                noUpdates2++;
-                testCompletion();
-            };
-        });
+            function EndTestNode1(n) {
+                RED.nodes.createNode(this, n);
+                this.on('input', function(msg) {
+                    msg.payload.toString().should.equal(message1);
+                    noUpdates1++;
+                    testCompletion();
+                });
+            }
+            RED.nodes.registerType("end-test-node1", EndTestNode1);
+
+            function EndTestNode2(n) {
+                RED.nodes.createNode(this, n);
+                this.on('input', function(msg) {
+                    msg.payload.toString().should.equal(message2);
+                    noUpdates2++;
+                    testCompletion();
+                });
+            }
+            RED.nodes.registerType("end-test-node2", EndTestNode2);
+        }
+
+        var testNodes = [coapRequestNode, injectNode, endTest];
+        helper.load(testNodes, flow);
 
     });
 
@@ -369,19 +446,19 @@ describe('CoapRequestNode', function() {
             {
                 format: 'text/plain',
                 message: 'this is a plain text message.',
-                decode: function (buf) { return Promise.resolve(buf.toString()); }
+                decode: function(buf) { return Promise.resolve(buf.toString()); }
             },
             {
                 format: 'application/json',
                 message: { thisIs: 'JSON' },
-                decode: function (buf) { return Promise.resolve(JSON.parse(buf.toString())); }
+                decode: function(buf) { return Promise.resolve(JSON.parse(buf.toString())); }
             },
             {
                 format: 'application/cbor',
                 message: { thisIs: 'CBOR' },
-                decode: function (buf) { return new Promise( function (resolve, reject) {
-                    cbor.decodeFirst(buf,function (error, value) {
-                        if ( error ) {
+                decode: function(buf) { return new Promise(function(resolve, reject) {
+                    cbor.decodeFirst(buf, function(error, value) {
+                        if (error) {
                             reject(error);
                         } else {
                             resolve(value);
@@ -391,8 +468,8 @@ describe('CoapRequestNode', function() {
             }
         ];
 
-        for ( i = 0; i < serializeFormatTests.length; ++i ) {
-            ( function (test) {
+        for (i = 0; i < serializeFormatTests.length; ++i) {
+            (function(test) {
                 it('should be able to serialize `' + test.format + '` request payload', function(done) {
                     var port = getPort();
 
@@ -435,14 +512,14 @@ describe('CoapRequestNode', function() {
                     var testNodes = [coapRequestNode, injectNode];
                     helper.load(testNodes, flow);
                 });
-            } ) (serializeFormatTests[i]);
+            }) (serializeFormatTests[i]);
         }
 
         var deserializeFormatTests = [
             {
                 format: 'text/plain',
                 message: 'this is a plain text message.',
-                encode: function (s) { return s; }
+                encode: function(s) { return s; }
             },
             {
                 format: 'application/json',
@@ -457,12 +534,12 @@ describe('CoapRequestNode', function() {
             {
                 format: 'application/link-format',
                 message: linkFormat.parse('</r1>;if=foo;rt=bar,</r2>;if=foo;rt=baz;obs'),
-                encode: function (lf) { return lf.toString(); }
+                encode: function(lf) { return lf.toString(); }
             }
         ];
 
-        for ( i = 0; i < deserializeFormatTests.length; ++i ) {
-            ( function (test) {
+        for (i = 0; i < deserializeFormatTests.length; ++i) {
+            (function(test) {
                 it('should be able to deserialize `' + test.format + '` response payload', function(done) {
                     var port = getPort();
 
@@ -486,8 +563,19 @@ describe('CoapRequestNode', function() {
                                     name: "coapRequestGet",
                                     observe: false,
                                     url: "coap://localhost:" + port + "/test-resource",
-                                }
+                                    wires: [["end-test-node"]],
+                                },
+                                {
+                                    id: "end-test-node",
+                                    type: "end-test-node",
+                                    name: "end-test-node",
+                                },
                                ];
+
+                    var endTestNode = helper.endTestNode(done, function(msg) {
+                        Buffer.isBuffer(msg.payload).should.be.false;
+                        msg.payload.should.deepEqual(test.message);
+                    });
 
                     var server = coap.createServer();
                     server.on('request', function(req, res) {
@@ -498,19 +586,10 @@ describe('CoapRequestNode', function() {
                     });
                     server.listen(port);
 
-                    var testNodes = [coapRequestNode, injectNode];
-                    helper.load(testNodes, flow, function() {
-                        //Let's catch the response and compare the payload to the expected result.
-                        var coapRequest = helper.getNode("coapRequest");
-                        coapRequest.payloadDecodedHandler = function(payload) {
-                            helper.endTest(done,function(){
-                                Buffer.isBuffer(payload).should.be.false;
-                                payload.should.deepEqual(test.message);
-                            });
-                        };
-                    });
+                    var testNodes = [coapRequestNode, injectNode, endTestNode];
+                    helper.load(testNodes, flow);
                 });
-            } ) (deserializeFormatTests[i]);
+            }) (deserializeFormatTests[i]);
         }
 
         it('should return raw buffer if configured to', function(done) {
@@ -536,10 +615,21 @@ describe('CoapRequestNode', function() {
                             observe: false,
                             "raw-buffer": true,
                             url: "coap://localhost:" + port + "/test-resource",
+                            wires: [["end-test-node"]],
+                        },
+                        {
+                            id: "end-test-node",
+                            type: "end-test-node",
+                            name: "end-test-node",
                         },
                        ];
 
-            var testNodes = [coapRequestNode, injectNode];
+            var endTestNode = helper.endTestNode(done, function(msg) {
+                Buffer.isBuffer(msg.payload).should.be.true;
+                msg.payload.toString().should.equal(message);
+            });
+
+            var testNodes = [coapRequestNode, injectNode, endTestNode];
             var message = "Got it!";
 
             // let's make a CoAP server to respond to our requests (no matter how silly they are)
@@ -553,16 +643,7 @@ describe('CoapRequestNode', function() {
             });
             server.listen(port);
 
-            helper.load(testNodes, flow, function() {
-                //Let's catch the response and compare the payload to the expected result.
-                var coapRequest = helper.getNode("coapRequest");
-                coapRequest.payloadDecodedHandler = function(payload) {
-                    helper.endTest(done,function(){
-                        Buffer.isBuffer( payload ).should.be.true;
-                        payload.toString().should.equal(message);
-                    });
-                };
-            });
+            helper.load(testNodes, flow);
         });
 
         it('should default to string for unknown content format', function(done) {
@@ -588,10 +669,21 @@ describe('CoapRequestNode', function() {
                             observe: false,
                             "raw-buffer": false,
                             url: "coap://localhost:" + port + "/test-resource",
+                            wires: [["end-test-node"]],
+                        },
+                        {
+                            id: "end-test-node",
+                            type: "end-test-node",
+                            name: "end-test-node",
                         },
                        ];
 
-            var testNodes = [coapRequestNode, injectNode];
+            var endTestNode = helper.endTestNode(done, function(msg) {
+                (typeof msg.payload).should.equal("string");
+                msg.payload.should.equal(message);
+            });
+
+            var testNodes = [coapRequestNode, injectNode, endTestNode];
             var message = "Got it!";
 
             // let's make a CoAP server to respond to our requests (no matter how silly they are)
@@ -604,16 +696,7 @@ describe('CoapRequestNode', function() {
             });
             server.listen(port);
 
-            helper.load(testNodes, flow, function() {
-                //Let's catch the response and compare the payload to the expected result.
-                var coapRequest = helper.getNode("coapRequest");
-                coapRequest.payloadDecodedHandler = function(payload) {
-                    helper.endTest(done,function(){
-                        (typeof payload).should.equal("string");
-                        payload.should.equal(message);
-                    });
-                };
-            });
+            helper.load(testNodes, flow);
         });
     });
 });

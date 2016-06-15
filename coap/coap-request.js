@@ -35,62 +35,35 @@ module.exports = function(RED) {
             return payload;
         }
 
-        // this is for testing purposes- payloadDecodedHandler should be set by test code to inspect the payload
-        node.payloadDecodedHandler = function(payload) {};
-
-        function onPayloadDecoded(payload) { 
-            node.payloadDecodedHandler(payload);
-        }
-
-        function _onCborDecode(err, data) {
-            if (err) {
-                return false;
-            }
-            var payload = data[0];
-            node.send({
-                payload: payload,
-            });
-            onPayloadDecoded(payload);
-        }
-
         function _makeRequest(msg) {
             var reqOpts = url.parse(node.options.url || msg.url);
             reqOpts.method = ( node.options.method || msg.method || 'GET' ).toUpperCase();
             reqOpts.headers = {};
             reqOpts.headers['Content-Format'] = node.options.contentFormat;
+
+            function _send(payload) {
+                node.send(Object.assign({}, msg, { payload: payload }));
+            }
+
             function _onResponse(res) {
                 function _onResponseData(data) {
-                    var payload = null;
                     if ( node.options.rawBuffer ) {
-                        node.send({
-                            payload: data,
-                        });
-                        onPayloadDecoded(data);
+                        _send(data);
                     } else if (res.headers['Content-Format'] === 'text/plain') {
-                        payload = data.toString();
-                        node.send({
-                            payload: payload,
-                        });
-                        onPayloadDecoded(payload);
+                        _send(data.toString());
                     } else if (res.headers['Content-Format'] === 'application/json') {
-                        payload = JSON.parse(data.toString());
-                        node.send({
-                            payload: payload,
-                        });
-                        onPayloadDecoded(payload);
+                        _send(JSON.parse(data.toString()));
                     } else if (res.headers['Content-Format'] === 'application/cbor') {
-                        cbor.decodeAll(data, _onCborDecode);
+                        cbor.decodeAll(data, function (err, data) {
+                            if (err) {
+                                return false;
+                            }
+                            _send(data[0]);
+                        });
                     } else if (res.headers['Content-Format'] === 'application/link-format') {
-                        payload = linkFormat.parse( data.toString() );
-                        node.send({
-                            payload: payload,
-                        });
-                        onPayloadDecoded(payload);
+                        _send(linkFormat.parse(data.toString()));
                     } else {
-                        node.send({
-                            payload: data.toString(),
-                        });
-                        onPayloadDecoded(data.toString());
+                        _send(data.toString());
                     }
                 }
 
