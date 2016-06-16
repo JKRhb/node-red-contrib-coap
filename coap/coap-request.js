@@ -47,6 +47,7 @@ module.exports = function(RED) {
                     node.send(Object.assign({}, msg, {
                         payload: payload,
                         headers: res.headers,
+                        statusCode: res.code,
                     }));
                 }
 

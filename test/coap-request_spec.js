@@ -221,6 +221,52 @@ describe('CoapRequestNode', function() {
             helper.load(testNodes, flow);
         });
 
+        it('should export status', function(done) {
+            var port = getPort();
+            var flow = [
+                        {
+                            id: "inject",
+                            type: "inject",
+                            name: "inject",
+                            payload: "",
+                            payloadType: "none",
+                            repeat: "",
+                            crontab: "",
+                            once: true,
+                            wires: [["coapRequest"]],
+                        },
+                        {
+                            id: "coapRequest",
+                            type: "coap request",
+                            "content-format": "text/plain",
+                            method: "GET",
+                            name: "coapRequest",
+                            observe: false,
+                            url: "coap://localhost:" + port + "/test-resource",
+                            wires: [["end-test-node"]]
+                        },
+                        {
+                            id: "end-test-node",
+                            type: "end-test-node",
+                            name: "end-test-node",
+                        },
+                       ];
+
+            var endTestNode = helper.endTestNode(done, function(msg) {
+                msg.should.have.property('statusCode', '4.01');
+            });
+
+            var testNodes = [coapRequestNode, injectNode, changeNode, endTestNode];
+
+            var server = coap.createServer();
+            server.on('request', function(req, res) {
+                res.code = '4.01';
+                res.end('anything');
+            });
+            server.listen(port);
+            helper.load(testNodes, flow);
+        });
+
         it('should export headers', function(done) {
             var port = getPort();
             var flow = [
