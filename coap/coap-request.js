@@ -41,11 +41,16 @@ module.exports = function(RED) {
             reqOpts.headers = {};
             reqOpts.headers['Content-Format'] = node.options.contentFormat;
 
-            function _send(payload) {
-                node.send(Object.assign({}, msg, { payload: payload }));
-            }
-
             function _onResponse(res) {
+
+                function _send(payload) {
+                    node.send(Object.assign({}, msg, {
+                        payload: payload,
+                        headers: res.headers,
+                        statusCode: res.code,
+                    }));
+                }
+
                 function _onResponseData(data) {
                     if ( node.options.rawBuffer ) {
                         _send(data);
