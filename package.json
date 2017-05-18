@@ -5,7 +5,8 @@
   "dependencies": {
     "cbor": "^1.0.4",
     "coap": "^0.16.0",
-    "h5.linkformat": "0.0.0"
+    "h5.linkformat": "0.0.0",
+    "uri-js": "^3.0.2"
   },
   "devDependencies": {
     "express": "^4.13.4",

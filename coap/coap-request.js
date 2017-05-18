@@ -3,7 +3,7 @@ module.exports = function(RED) {
 
     var coap = require('coap');
     var cbor = require('cbor');
-    var url = require('url');
+    var url = require('uri-js');
     var linkFormat = require('h5.linkformat');
 
     coap.registerFormat('application/cbor', 60);
@@ -37,6 +37,7 @@ module.exports = function(RED) {
 
         function _makeRequest(msg) {
             var reqOpts = url.parse(node.options.url || msg.url);
+            reqOpts.pathname = reqOpts.path;
             reqOpts.method = ( node.options.method || msg.method || 'GET' ).toUpperCase();
             reqOpts.headers = {};
             reqOpts.headers['Content-Format'] = node.options.contentFormat;
