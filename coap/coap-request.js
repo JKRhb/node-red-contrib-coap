@@ -109,6 +109,13 @@ module.exports = function(RED) {
         this.on('input', function(msg) {
             _makeRequest(msg);
         });
+        
+        this.on('close', function(done) {
+			if (node.stream) {
+				node.stream.close();
+            }
+			done();
+        });
     }
     RED.nodes.registerType("coap request", CoapRequestNode);
 };
