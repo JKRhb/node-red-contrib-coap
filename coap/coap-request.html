@@ -9,6 +9,7 @@
                 function(v){return [ "", "GET", "PUT", "POST", "DELETE" ].indexOf(v) !== -1;}
             },
             observe: {value:false, required:true},
+			observe_on_start: {value:true, required:true},
             url: {value:""},
             'content-format': {value: "text/plain"},
             'raw-buffer': {value: false, required:true},
@@ -47,6 +48,8 @@
         <label/>
         <input id="node-input-observe" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;"/>
         <label for="node-input-observe" style="width: auto; margin-right: 1em;">Observe?</label>
+		<input id="node-input-observe_on_start" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;"/>
+        <label for="node-input-observe_on_start" style="width: auto; margin-right: 1em;">Observe on start?</label>
         <input id="node-input-raw-buffer" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;"/>
         <label for="node-input-raw-buffer" style="width: auto; margin-right: 1em;">Raw buffer?</label>
     </div>
