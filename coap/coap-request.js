@@ -70,7 +70,8 @@ module.exports = function(RED) {
             function _onResponse(res) {
 				
                 function _onResponseData(data) {
-					node.status({fill:"green",shape:"dot",text:"Connected "+(reqOpts.observe ? "(observed)":"")+new Date()});
+					
+					node.status({fill:"green",shape:"dot",text:(reqOpts.observe ? "Observed data ":"Data ")+"received ("+new Date().toLocaleTimeString()+")"});
                     var payload = null;
                     if ( node.options.rawBuffer ) {
                         node.send({
