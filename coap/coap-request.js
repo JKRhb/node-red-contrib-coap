@@ -3,32 +3,25 @@ module.exports = function(RED) {
 
     var coap = require('coap');
     var cbor = require('cbor');
-    var url = require('url');
+    var url = require('uri-js');
     var linkFormat = require('h5.linkformat');
 
     coap.registerFormat('application/cbor', 60);
 
-	var states={
-		none:0,
-		requested:1,
-		responded:2,
-	};
     function CoapRequestNode(n) {
         RED.nodes.createNode(this, n);
         var node = this;
-		
-		var connectstate=states.none;
 
         // copy "coap request" configuration locally
         node.options = {};
-        node.options.method = n.method||"GET";
-        node.options.observe = n.observe||false;
-		node.options.observe_on_start = n.observe_on_start||false;
+        node.options.method = n.method;
+        node.options.observe = n.observe;
+	    node.options.observe_on_start = n.observe_on_start||false;
         node.options.name = n.name;
         node.options.url = n.url;
         node.options.contentFormat = n['content-format'];
         node.options.rawBuffer = n['raw-buffer'];
-		
+
         function _constructPayload(msg, contentFormat) {
             var payload = null;
 
@@ -43,71 +36,42 @@ module.exports = function(RED) {
             return payload;
         }
 
-        // this is for testing purposes- payloadDecodedHandler should be set by test code to inspect the payload
-        node.payloadDecodedHandler = function(payload) {};
-
-        function onPayloadDecoded(payload) { 
-            node.payloadDecodedHandler(payload);
-        }
-
-        function _onCborDecode(err, data) {
-            if (err) {
-                return false;
-            }
-            var payload = data[0];
-            node.send({
-                payload: payload,
-            });
-            onPayloadDecoded(payload);
-        }
-
         function _makeRequest(msg) {
-			var reqOpts = url.parse(node.options.url || msg.url);
+            var reqOpts = url.parse(node.options.url || msg.url);
+            reqOpts.pathname = reqOpts.path;
             reqOpts.method = ( node.options.method || msg.method || 'GET' ).toUpperCase();
             reqOpts.headers = {};
             reqOpts.headers['Content-Format'] = node.options.contentFormat;
-			reqOpts.timeout=10;
+
             function _onResponse(res) {
-				
+
+                function _send(payload) {
+                    node.send(Object.assign({}, msg, {
+                        payload: payload,
+                        headers: res.headers,
+                        statusCode: res.code,
+                    }));
+                }
+
                 function _onResponseData(data) {
-					
 					node.status({fill:"green",shape:"dot",text:(reqOpts.observe ? "Observed data ":"Data ")+"received ("+new Date().toLocaleTimeString()+")"});
-                    var payload = null;
                     if ( node.options.rawBuffer ) {
-                        node.send({
-                            payload: data,
-							state: 1
-                        });
-                        onPayloadDecoded(data);
+                        _send(data);
                     } else if (res.headers['Content-Format'] === 'text/plain') {
-                        payload = data.toString();
-                        node.send({
-                            payload: payload,
-							state: 1
-                        });
-                        onPayloadDecoded(payload);
+                        _send(data.toString());
                     } else if (res.headers['Content-Format'] === 'application/json') {
-                        payload = JSON.parse(data.toString());
-                        node.send({
-                            payload: payload,
-							state: 1
-                        });
-                        onPayloadDecoded(payload);
+                        _send(JSON.parse(data.toString()));
                     } else if (res.headers['Content-Format'] === 'application/cbor') {
-                        cbor.decodeAll(data, _onCborDecode);
+                        cbor.decodeAll(data, function (err, data) {
+                            if (err) {
+                                return false;
+                            }
+                            _send(data[0]);
+                        });
                     } else if (res.headers['Content-Format'] === 'application/link-format') {
-                        payload = linkFormat.parse( data.toString() );
-                        node.send({
-                            payload: payload,
-							state: 1
-                        });
-                        onPayloadDecoded(payload);
+                        _send(linkFormat.parse(data.toString()));
                     } else {
-                        node.send({
-                            payload: data.toString(),
-							state: 1
-                        });
-                        onPayloadDecoded(data.toString());
+                        _send(data.toString());
                     }
                 }
 
@@ -131,26 +95,18 @@ module.exports = function(RED) {
                 node.stream.close();
             }
 
-			node.status({fill:"yellow",shape:"ring",text:"Pending ("+(reqOpts.observe ? "Observed ":"")+reqOpts.method+" request)"});
-			
-			
             var req = coap.request(reqOpts);
-			
             req.on('response', _onResponse);
             req.on('error', function(err) {
                 node.log('client error');
                 node.log(err);
 				node.status({fill:"red",shape:"ring",text:"Error:"+err});
-				node.send({
-					state: 0
-				});
             });
 			req.on('timeout', function() {
 				node.status({fill:"red",shape:"ring",text:"Timeout"});
-				node.send({
-					state: 0
-				});
             });
+			
+			node.status({fill:"yellow",shape:"ring",text:"Pending ("+(reqOpts.observe ? "Observed ":"")+reqOpts.method+" request)"});
 
             if (payload) {
                 req.write(payload);
@@ -170,12 +126,11 @@ module.exports = function(RED) {
         });
 		
 		node.status({});
+		
 		if(node.options.observe && node.options.observe_on_start){
 			var dummyPayload={payload:""};
 			_makeRequest(dummyPayload);
 		}
     }
-	
-	
     RED.nodes.registerType("coap request", CoapRequestNode);
 };
