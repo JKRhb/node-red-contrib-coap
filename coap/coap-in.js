@@ -12,11 +12,18 @@ module.exports = function(RED) {
         node.options = {};
         node.options.name = n.name;
         node.options.port = n.port;
+        node.options.ipv6 = n.ipv6;
 
         node._inputNodes = [];    // collection of "coap in" nodes that represent coap resources
 
         // Setup node-coap server and start
-        node.server = new coap.createServer();
+        var serverSettings = {};
+        if (node.options.ipv6) {
+            serverSettings.type = 'udp6';
+        } else {
+            serverSettings.type = 'udp4';
+        }
+        node.server = new coap.createServer(serverSettings);
         node.server.on('request', function(req, res) {
             node.handleRequest(req, res);
             res.on('error', function(err) {
