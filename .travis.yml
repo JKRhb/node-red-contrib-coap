@@ -1,13 +1,12 @@
 language: node_js
-before_install:
-    - npm install -g npm@~1.4.18
 node_js:
     - node
     - lts/*
     - 14
     - 12
+before_install:
+  - npm install -g npm@latest
+install:
+  - npm install --dev
 script:
-    - istanbul cover ./node_modules/.bin/grunt --report lcovonly && istanbul report text && ( cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js || true ) && rm -rf coverage
-before_script:
-    - npm install -g istanbul
-    - npm install coveralls
+  - npm test

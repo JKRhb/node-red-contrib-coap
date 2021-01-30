@@ -3,8 +3,8 @@ var should = require("should");
 var coap = require("coap");
 var url = require("url");
 var coapInNode = require("../coap/coap-in.js");
-var functionNode = require("node-red/nodes/core/core/80-function.js");
-var helper = require("./helper.js");
+var functionNode = require("@node-red/nodes/core/function/10-function.js");
+var helper = require("node-red-node-test-helper");
 
 describe('CoapInNode', function() {
     beforeEach(function(done) {
@@ -58,17 +58,15 @@ describe('CoapInNode', function() {
                    ];
 
         // Need to register nodes in order to use them
-        var testNodes = [functionNode, coapInNode];
-        helper.load(testNodes, flow, function() {
+        helper.load(coapInNode, flow, function() {
             var urlStr = "coap://localhost:8888/unregistered";
             var opts = url.parse(urlStr);
             opts.method = 'GET';
             var req = coap.request(opts);
 
             req.on('response', function(res) {
-                helper.endTest(done,function(){
-                    res.code.should.equal('4.04');
-                });
+                res.code.should.equal('4.04');
+                done();
             });
             req.end();
         });
@@ -120,9 +118,8 @@ describe('CoapInNode', function() {
                         var req = coap.request(opts);
 
                         req.on('response', function(res) {
-                            helper.endTest(done,function(){
-                                res.payload.toString().should.equal(test.message);
-                            });
+                            res.payload.toString().should.equal(test.message);
+                            done();
                         });
                         req.end();
                     });
@@ -157,9 +154,8 @@ describe('CoapInNode', function() {
                 var req = coap.request(opts);
 
                 req.on('response', function(res) {
-                    helper.endTest(done,function(){
-                        res.code.should.equal('4.05');
-                    });
+                    res.code.should.equal('4.05');
+                    done();
                 });
                 req.end();
             });
