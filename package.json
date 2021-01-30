@@ -3,10 +3,12 @@
   "version": "0.3.0",
   "description": "CoAP support in Node-RED",
   "dependencies": {
-    "cbor": "^1.0.4",
-    "coap": "^0.16.0",
+    "cbor": "^6.0.1",
+    "coap": "^0.24.0",
+    "coveralls": "^3.1.0",
     "h5.linkformat": "0.0.0",
-    "uri-js": "^3.0.2"
+    "istanbul": "^0.4.5",
+    "uri-js": "^4.4.1"
   },
   "devDependencies": {
     "express": "^4.13.4",
