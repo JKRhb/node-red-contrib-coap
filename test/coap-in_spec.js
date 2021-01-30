@@ -72,59 +72,85 @@ describe('CoapInNode', function() {
         });
     });
 
-    describe('Methods', function() {
-
+    describe("Methods", function () {
         var methodTests = [
-            { method: 'GET',    message: 'You get me, buddy' },
-            { method: 'PUT',    message: 'This resource sucks–need to change it' },
-            { method: 'POST',   message: 'Welcome aboard!' },
-            { method: 'DELETE', message: 'Erase and rewind…' }
+            { method: "GET", message: "You get me, buddy" },
+            { method: "PUT", message: "This resource sucks–need to change it" },
+            { method: "POST", message: "Welcome aboard!" },
+            { method: "DELETE", message: "Erase and rewind…" },
         ];
 
-        for ( i = 0; i < methodTests.length; ++i ) {
-            ( function ( test ) {
-                it('should accept ' + test.method + ' requests', function(done) {
-                    var flow = [
+        var protocols = ["ipv4", "ipv6"];
+
+        for (var i = 0; i < protocols.length; i++) {
+            var protocol = protocols[i];
+
+            for (j = 0; j < methodTests.length; ++j) {
+                (function (test) {
+                    var serverAddress = "localhost";
+                    var ipv6Enabled = false;
+
+                    if (protocol == "ipv6") {
+                        serverAddress = "[::1]";
+                        ipv6Enabled = true;
+                    }
+
+                    it(
+                        "should accept " +
+                            test.method +
+                            " requests over " +
+                            protocol,
+                        function (done) {
+                            var flow = [
                                 {
-                                    id:"n1",
-                                    type:"coap-server",
-                                    name:"coapServer",
-                                    port:8888
+                                    id: "n1",
+                                    type: "coap-server",
+                                    name: "coapServer",
+                                    port: 8888,
+                                    ipv6: ipv6Enabled,
                                 },
                                 {
-                                    id:"n2",
-                                    type:"coap in",
-                                    method:test.method,
-                                    name:"coapIn",
-                                    url:"/test",
-                                    server:"n1",
-                                    wires:[["n3"]]
+                                    id: "n2",
+                                    type: "coap in",
+                                    method: test.method,
+                                    name: "coapIn",
+                                    url: "/test",
+                                    server: "n1",
+                                    wires: [["n3"]],
                                 },
                                 {
-                                    id:'n3',
-                                    type:"function",
-                                    name:"coapOutGet",
-                                    func:"msg.res.end('"+ test.message +"');\nreturn msg;",
-                                    wires:[]
-                                }
-                               ];
+                                    id: "n3",
+                                    type: "function",
+                                    name: "coapOutGet",
+                                    func:
+                                        "msg.res.end('" +
+                                        test.message +
+                                        "');\nreturn msg;",
+                                    wires: [],
+                                },
+                            ];
 
-                    // Need to register nodes in order to use them
-                    var testNodes = [functionNode, coapInNode];
-                    helper.load(testNodes, flow, function() {
-                        var urlStr = "coap://localhost:8888/test";
-                        var opts = url.parse(urlStr);
-                        opts.method = test.method;
-                        var req = coap.request(opts);
+                            // Need to register nodes in order to use them
+                            var testNodes = [functionNode, coapInNode];
+                            helper.load(testNodes, flow, function () {
+                                var urlStr =
+                                    "coap://" + serverAddress + ":8888/test";
+                                var opts = url.parse(urlStr);
+                                opts.method = test.method;
+                                var req = coap.request(opts);
 
-                        req.on('response', function(res) {
-                            res.payload.toString().should.equal(test.message);
-                            done();
-                        });
-                        req.end();
-                    });
-                });
-            } ) ( methodTests[i] );
+                                req.on("response", function (res) {
+                                    res.payload
+                                        .toString()
+                                        .should.equal(test.message);
+                                    done();
+                                });
+                                req.end();
+                            });
+                        }
+                    );
+                })(methodTests[j]);
+            }
         }
 
         it('should return 4.05 for unregistered methods', function(done) {
