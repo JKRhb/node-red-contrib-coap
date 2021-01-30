@@ -70,7 +70,7 @@ describe('CoapRequestNode', function() {
                     var port = getPort();
                     var flow = [
                                 {
-                                    id: "inject",
+                                    id: "n1",
                                     type: "inject",
                                     name: "inject",
                                     payload: "",
@@ -78,20 +78,20 @@ describe('CoapRequestNode', function() {
                                     repeat: "",
                                     crontab: "",
                                     once: true,
-                                    wires: [["coapRequest"]],
+                                    wires: [["n2"]],
                                 },
                                 {
-                                    id: "coapRequest",
+                                    id: "n2",
                                     type: "coap request",
                                     "content-format": "text/plain",
                                     method: test.method,
                                     name: "coapRequest",
                                     observe: false,
                                     url: "coap://localhost:" + port + "/test-resource",
-                                    wires: [["end-test-node"]],
+                                    wires: [["n3"]],
                                 },
                                 {
-                                    id: "end-test-node",
+                                    id: "n3",
                                     type: "end-test-node",
                                     name: "end-test-node",
                                 },
@@ -121,7 +121,7 @@ describe('CoapRequestNode', function() {
             var port = getPort();
             var flow = [
                         {
-                            id: "inject",
+                            id: "n1",
                             type: "inject",
                             name: "inject",
                             payload: "",
@@ -129,10 +129,10 @@ describe('CoapRequestNode', function() {
                             repeat: "",
                             crontab: "",
                             once: true,
-                            wires: [["setMethod"]],
+                            wires: [["n2"]],
                         },
                         {
-                            id: "setMethod",
+                            id: "n2",
                             type: "change",
                             action: "replace",
                             property: "method",
@@ -140,10 +140,10 @@ describe('CoapRequestNode', function() {
                             to: "PUT",
                             reg: false,
                             name: "set method",
-                            wires: [["coapRequest"]]
+                            wires: [["n3"]],
                         },
                         {
-                            id: "coapRequest",
+                            id: "n3",
                             type: "coap request",
                             "content-format": "text/plain",
                             method: "",
@@ -169,7 +169,7 @@ describe('CoapRequestNode', function() {
             var port = getPort();
             var flow = [
                         {
-                            id: "inject",
+                            id: "n1",
                             type: "inject",
                             name: "inject",
                             payload: "",
@@ -177,10 +177,10 @@ describe('CoapRequestNode', function() {
                             repeat: "",
                             crontab: "",
                             once: true,
-                            wires: [["setRandomProperty"]],
+                            wires: [["n2"]],
                         },
                         {
-                            id: "setRandomProperty",
+                            id: "n2",
                             type: "change",
                             action: "replace",
                             property: "random_property",
@@ -188,20 +188,20 @@ describe('CoapRequestNode', function() {
                             to: "I will survive",
                             reg: false,
                             name: "set random_property",
-                            wires: [["coapRequest"]]
+                            wires: [["n3"]],
                         },
                         {
-                            id: "coapRequest",
+                            id: "n3",
                             type: "coap request",
                             "content-format": "text/plain",
                             method: "",
                             name: "coapRequest",
                             observe: false,
                             url: "coap://localhost:" + port + "/test-resource",
-                            wires: [["readRandomProperty"]]
+                            wires: [["n4"]],
                         },
                         {
-                            id: "readRandomProperty",
+                            id: "n4",
                             type: "end-test-node",
                             name: "read random_property",
                         },
@@ -225,7 +225,7 @@ describe('CoapRequestNode', function() {
             var port = getPort();
             var flow = [
                         {
-                            id: "inject",
+                            id: "n1",
                             type: "inject",
                             name: "inject",
                             payload: "",
@@ -233,20 +233,20 @@ describe('CoapRequestNode', function() {
                             repeat: "",
                             crontab: "",
                             once: true,
-                            wires: [["coapRequest"]],
+                            wires: [["n2"]],
                         },
                         {
-                            id: "coapRequest",
+                            id: "n2",
                             type: "coap request",
                             "content-format": "text/plain",
                             method: "GET",
                             name: "coapRequest",
                             observe: false,
                             url: "coap://localhost:" + port + "/test-resource",
-                            wires: [["end-test-node"]]
+                            wires: [["n3"]],
                         },
                         {
-                            id: "end-test-node",
+                            id: "n3",
                             type: "end-test-node",
                             name: "end-test-node",
                         },
@@ -271,7 +271,7 @@ describe('CoapRequestNode', function() {
             var port = getPort();
             var flow = [
                         {
-                            id: "inject",
+                            id: "n1",
                             type: "inject",
                             name: "inject",
                             payload: "",
@@ -279,20 +279,20 @@ describe('CoapRequestNode', function() {
                             repeat: "",
                             crontab: "",
                             once: true,
-                            wires: [["coapRequest"]],
+                            wires: [["n2"]],
                         },
                         {
-                            id: "coapRequest",
+                            id: "n2",
                             type: "coap request",
                             "content-format": "text/plain",
                             method: "GET",
                             name: "coapRequest",
                             observe: false,
                             url: "coap://localhost:" + port + "/test-resource",
-                            wires: [["end-test-node"]]
+                            wires: [["n3"]],
                         },
                         {
-                            id: "end-test-node",
+                            id: "n3",
                             type: "end-test-node",
                             name: "end-test-node",
                         },
@@ -320,7 +320,7 @@ describe('CoapRequestNode', function() {
             var port = getPort();
             var flow = [
                         {
-                            id: "inject",
+                            id: "n1",
                             type: "inject",
                             name: "inject",
                             payload: "",
@@ -328,10 +328,10 @@ describe('CoapRequestNode', function() {
                             repeat: "",
                             crontab: "",
                             once: true,
-                            wires: [["coapRequest"]],
+                            wires: [["n2"]],
                         },
                         {
-                            id: "coapRequest",
+                            id: "n2",
                             type: "coap request",
                             "content-format": "text/plain",
                             method: "",
@@ -359,7 +359,7 @@ describe('CoapRequestNode', function() {
         var port = getPort();
         var flow = [
                     {
-                        id: "inject",
+                        id: "n1",
                         type: "inject",
                         name: "inject",
                         payload: "",
@@ -367,10 +367,10 @@ describe('CoapRequestNode', function() {
                         repeat: "",
                         crontab: "",
                         once: true,
-                        wires: [["setUrl"]],
+                        wires: [["n2"]],
                     },
                     {
-                        id: "setUrl",
+                        id: "n2",
                         type: "change",
                         action: "replace",
                         property: "url",
@@ -378,10 +378,10 @@ describe('CoapRequestNode', function() {
                         to: "coap://localhost:" + port + "/test-resource",
                         reg: false,
                         name: "set URL",
-                        wires: [["coapRequest"]]
+                        wires: [["n3"]],
                     },
                     {
-                        id: "coapRequest",
+                        id: "n3",
                         type: "coap request",
                         "content-format": "text/plain",
                         method: "GET",
@@ -410,7 +410,7 @@ describe('CoapRequestNode', function() {
         // - 4 "coap request" GET nodes with "Observe" option enabled which get triggered by their respective "inject" nodes
         var flow = [
                     {
-                        id: "inject1",
+                        id: "n1",
                         type: "inject",
                         name: "Fire once (inject)",
                         payload: "",
@@ -418,25 +418,25 @@ describe('CoapRequestNode', function() {
                         repeat: "",
                         crontab: "",
                         once: true,
-                        wires: [["coapRequest1"]],
+                        wires: [["n2"]],
                     },
                     {
-                        id: "coapRequest1",
+                        id: "n2",
                         type: "coap request",
                         "content-format": "text/plain",
                         method: "GET",
                         name: "coapRequestGetObserve1",
                         observe: true,
                         url: "coap://localhost:" + port + "/test-resource1",
-                        wires: [["end-test-node1"]]
+                        wires: [["n3"]],
                     },
                     {
-                        id: "end-test-node1",
+                        id: "n3",
                         type: "end-test-node1",
                         name: "end-test-node1",
                     },
                     {
-                        id: "inject2",
+                        id: "n4",
                         type: "inject",
                         name: "Fire once (inject)",
                         payload: "",
@@ -444,20 +444,20 @@ describe('CoapRequestNode', function() {
                         repeat: "",
                         crontab: "",
                         once: true,
-                        wires: [["coapRequest2"]],
+                        wires: [["n5"]],
                     },
                     {
-                        id: "coapRequest2",
+                        id: "n5",
                         type: "coap request",
                         "content-format": "text/plain",
                         method: "GET",
                         name: "coapRequestGetObserve2",
                         observe: true,
                         url: "coap://localhost:" + port + "/test-resource2",
-                        wires: [["end-test-node2"]]
+                        wires: [["n6"]],
                     },
                     {
-                        id: "end-test-node2",
+                        id: "n6",
                         type: "end-test-node2",
                         name: "end-test-node2",
                     },
@@ -570,7 +570,7 @@ describe('CoapRequestNode', function() {
 
                     var flow = [
                                 {
-                                    id: "inject",
+                                    id: "n1",
                                     type: "inject",
                                     name: "Fire once",
                                     payload: test.message,
@@ -578,10 +578,10 @@ describe('CoapRequestNode', function() {
                                     repeat: "",
                                     crontab: "",
                                     once: true,
-                                    wires: [["coapRequest"]],
+                                    wires: [["n2"]],
                                 },
                                 {
-                                    id: "coapRequest",
+                                    id: "n2",
                                     type: "coap request",
                                     "content-format": test.format,
                                     method: "POST",
@@ -640,7 +640,7 @@ describe('CoapRequestNode', function() {
 
                     var flow = [
                                 {
-                                    id: "inject",
+                                    id: "n1",
                                     type: "inject",
                                     name: "Fire once",
                                     payload: "",
@@ -648,20 +648,20 @@ describe('CoapRequestNode', function() {
                                     repeat: "",
                                     crontab: "",
                                     once: true,
-                                    wires: [["coapRequest"]],
+                                    wires: [["n2"]],
                                 },
                                 {
-                                    id: "coapRequest",
+                                    id: "n2",
                                     type: "coap request",
                                     "content-format": test.format,
                                     method: "GET",
                                     name: "coapRequestGet",
                                     observe: false,
                                     url: "coap://localhost:" + port + "/test-resource",
-                                    wires: [["end-test-node"]],
+                                    wires: [["n3"]],
                                 },
                                 {
-                                    id: "end-test-node",
+                                    id: "n3",
                                     type: "end-test-node",
                                     name: "end-test-node",
                                 },
@@ -691,7 +691,7 @@ describe('CoapRequestNode', function() {
             var port = getPort();
             var flow = [
                         {
-                            id: "inject",
+                            id: "n1",
                             type: "inject",
                             name: "inject",
                             payload: "",
@@ -699,10 +699,10 @@ describe('CoapRequestNode', function() {
                             repeat: "",
                             crontab: "",
                             once: true,
-                            wires: [["coapRequest"]],
+                            wires: [["n2"]],
                         },
                         {
-                            id: "coapRequest",
+                            id: "n2",
                             type: "coap request",
                             "content-format": "text/plain",
                             method: "GET",
@@ -710,10 +710,10 @@ describe('CoapRequestNode', function() {
                             observe: false,
                             "raw-buffer": true,
                             url: "coap://localhost:" + port + "/test-resource",
-                            wires: [["end-test-node"]],
+                            wires: [["n3"]],
                         },
                         {
-                            id: "end-test-node",
+                            id: "n3",
                             type: "end-test-node",
                             name: "end-test-node",
                         },
@@ -745,7 +745,7 @@ describe('CoapRequestNode', function() {
             var port = getPort();
             var flow = [
                         {
-                            id: "inject",
+                            id: "n1",
                             type: "inject",
                             name: "inject",
                             payload: "",
@@ -753,10 +753,10 @@ describe('CoapRequestNode', function() {
                             repeat: "",
                             crontab: "",
                             once: true,
-                            wires: [["coapRequest"]],
+                            wires: [["n2"]],
                         },
                         {
-                            id: "coapRequest",
+                            id: "n2",
                             type: "coap request",
                             "content-format": "text/plain",
                             method: "GET",
@@ -764,10 +764,10 @@ describe('CoapRequestNode', function() {
                             observe: false,
                             "raw-buffer": false,
                             url: "coap://localhost:" + port + "/test-resource",
-                            wires: [["end-test-node"]],
+                            wires: [["n3"]],
                         },
                         {
-                            id: "end-test-node",
+                            id: "n3",
                             type: "end-test-node",
                             name: "end-test-node",
                         },
