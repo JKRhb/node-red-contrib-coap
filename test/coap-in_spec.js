@@ -50,7 +50,7 @@ describe('CoapInNode', function() {
     it('should return 4.04 for unregistered paths', function(done) {
         var flow = [
                     {
-                        id:"coapServer",
+                        id:"n1",
                         type:"coap-server",
                         name:"coapServer",
                         port:8888
@@ -88,22 +88,22 @@ describe('CoapInNode', function() {
                 it('should accept ' + test.method + ' requests', function(done) {
                     var flow = [
                                 {
-                                    id:"coapServer",
+                                    id:"n1",
                                     type:"coap-server",
                                     name:"coapServer",
                                     port:8888
                                 },
                                 {
-                                    id:"coapIn",
+                                    id:"n2",
                                     type:"coap in",
                                     method:test.method,
                                     name:"coapIn",
                                     url:"/test",
-                                    server:"coapServer",
-                                    wires:[["coapOut"]]
+                                    server:"n1",
+                                    wires:[["n3"]]
                                 },
                                 {
-                                    id:'coapOut',
+                                    id:'n3',
                                     type:"function",
                                     name:"coapOutGet",
                                     func:"msg.res.end('"+ test.message +"');\nreturn msg;",
@@ -133,19 +133,18 @@ describe('CoapInNode', function() {
         it('should return 4.05 for unregistered methods', function(done) {
             var flow = [
                         {
-                            id:"coapServer",
+                            id:"n1",
                             type:"coap-server",
                             name:"coapServer",
                             port:8888
                         },
                         {
-                            id:"coapIn",
+                            id:"n2",
                             type:"coap in",
                             method: 'GET',
                             name:"coapIn",
                             url:"/test",
-                            server:"coapServer",
-                            wires:[["coapOut"]]
+                            server:"n1",
                         }
                        ];
 
