@@ -5,6 +5,10 @@
         <input type="text" id="node-config-input-name" placeholder="Name"/>
     </div>
     <div class="form-row">
+      <label for="node-config-input-ipv6"><i class="fa fa-cog"></i> Support IPv6</label>
+      <input type="checkbox" id="node-config-input-ipv6" style="display: inline-block; width: auto; vertical-align: top;"/> 
+    </div>
+    <div class="form-row">
         <label for="node-config-input-port">Port</label>
         <input type="text" id="node-config-input-port" placeholder="5683"/>
     <div class="form-tips">
@@ -21,7 +25,8 @@ RED.nodes.registerType('coap-server',{
   category: 'config',
   defaults: {
     name: {value:""},
-    port: {value:5683, required:true}
+    port: {value:5683, required:true},
+    ipv6: {value:true, required:true}
   },
   inputs:0,
   outputs:0,

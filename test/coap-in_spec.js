@@ -81,15 +81,34 @@ describe('CoapInNode', function() {
             { method: 'DELETE', message: 'Erase and rewind…' }
         ];
 
-        for ( i = 0; i < methodTests.length; ++i ) {
-            ( function ( test ) {
-                it('should accept ' + test.method + ' requests', function(done) {
-                    var flow = [
+        var protocols = ["ipv4", "ipv6"];
+
+        for (var i = 0; i < protocols.length; i++) {
+            var protocol = protocols[i];
+
+            for (j = 0; j < methodTests.length; ++j) {
+                (function (test) {
+                    var serverAddress = "localhost";
+                    var ipv6Enabled = false;
+
+                    if (protocol == "ipv6") {
+                        serverAddress = "[::1]";
+                        ipv6Enabled = true;
+                    }
+
+                    it(
+                        "should accept " +
+                            test.method +
+                            " requests over " +
+                            protocol,
+                        function (done) {
+                            var flow = [
                                 {
                                     id:"n1",
                                     type:"coap-server",
                                     name:"coapServer",
-                                    port:8888
+                                    port:8888,
+                                    ipv6: ipv6Enabled
                                 },
                                 {
                                     id:"n2",
@@ -112,7 +131,7 @@ describe('CoapInNode', function() {
                     // Need to register nodes in order to use them
                     var testNodes = [functionNode, coapInNode];
                     helper.load(testNodes, flow, function() {
-                        var urlStr = "coap://localhost:8888/test";
+                        var urlStr = "coap://" + serverAddress + ":8888/test";
                         var opts = url.parse(urlStr);
                         opts.method = test.method;
                         var req = coap.request(opts);
@@ -124,7 +143,8 @@ describe('CoapInNode', function() {
                         req.end();
                     });
                 });
-            } ) ( methodTests[i] );
+            } ) ( methodTests[j] );
+          }
         }
 
         it('should return 4.05 for unregistered methods', function(done) {
