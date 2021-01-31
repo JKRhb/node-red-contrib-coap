@@ -3,15 +3,12 @@ var coap = require("coap");
 var url = require("url");
 
 var coapRequestNode = require("../coap/coap-request.js");
-var injectNode = require("node-red/nodes/core/core/20-inject.js");
-var changeNode = require("node-red/nodes/core/logic/15-change.js");
+var injectNode = require("@node-red/nodes/core/common/20-inject.js");
+var changeNode = require("@node-red/nodes/core/function/15-change.js");
 
 var should = require("should");
-var helper = require("./helper.js");
+var helper = require("node-red-node-test-helper");
 var linkFormat = require('h5.linkformat');
-
-// TODO:
-// - should we move the test CoAP server creation to helper.js?
 
 describe('CoapRequestNode', function() {
     this.slow(300);
@@ -97,9 +94,16 @@ describe('CoapRequestNode', function() {
                                 },
                                ];
 
-                    var endTestNode = helper.endTestNode(done, function(msg) {
-                        msg.payload.toString().should.equal(test.message);
-                    });
+                    function endTestNode(RED) {
+                        function EndTestNode(n) {
+                            RED.nodes.createNode(this, n);
+                            this.on("input", function (msg) {
+                                msg.payload.toString().should.equal(test.message);
+                                done();
+                            });
+                        }
+                        RED.nodes.registerType("end-test-node", EndTestNode);
+                    }
                     var testNodes = [coapRequestNode, injectNode, endTestNode];
 
                     // let's make a CoAP server to respond to our requests (no matter how silly they are)
@@ -110,9 +114,9 @@ describe('CoapRequestNode', function() {
                         req.method.should.equal(test.method);
                         res.end(test.message);
                     });
-                    server.listen(port);
-
-                    helper.load(testNodes, flow);
+                    helper.load(testNodes, flow, function(){
+                        server.listen(port);
+                    });
                 });
             }) (methodTests[i]);
         }
@@ -157,12 +161,12 @@ describe('CoapRequestNode', function() {
 
             var server = coap.createServer();
             server.on('request', function(req, res) {
-                helper.endTest(done,function(){
-                    req.method.should.equal("PUT");
-                });
+                req.method.should.equal("PUT");
+                done();
             });
-            server.listen(port);
-            helper.load(testNodes, flow);
+            helper.load(testNodes, flow, function(){
+                server.listen(port);
+            });
         });
 
         it('should preserve message properties', function(done) {
@@ -207,9 +211,19 @@ describe('CoapRequestNode', function() {
                         },
                        ];
 
-            var endTestNode = helper.endTestNode(done, function(msg) {
-                msg.should.have.property('random_property', 'I will survive');
-            });
+            function endTestNode(RED) {
+                function EndTestNode(n) {
+                    RED.nodes.createNode(this, n);
+                    this.on("input", function (msg) {
+                        msg.should.have.property(
+                            "random_property",
+                            "I will survive"
+                        );
+                        done();
+                    });
+                }
+                RED.nodes.registerType("end-test-node", EndTestNode);
+            }
 
             var testNodes = [coapRequestNode, injectNode, changeNode, endTestNode];
 
@@ -217,8 +231,9 @@ describe('CoapRequestNode', function() {
             server.on('request', function(req, res) {
                 res.end('anything');
             });
-            server.listen(port);
-            helper.load(testNodes, flow);
+            helper.load(testNodes, flow, function(){
+                server.listen(port);
+            });
         });
 
         it('should export status', function(done) {
@@ -252,9 +267,16 @@ describe('CoapRequestNode', function() {
                         },
                        ];
 
-            var endTestNode = helper.endTestNode(done, function(msg) {
-                msg.should.have.property('statusCode', '4.01');
-            });
+            function endTestNode(RED) {
+                function EndTestNode(n) {
+                    RED.nodes.createNode(this, n);
+                    this.on("input", function (msg) {
+                        msg.should.have.property("statusCode", "4.01");
+                        done();
+                    });
+                }
+                RED.nodes.registerType("end-test-node", EndTestNode);
+            }
 
             var testNodes = [coapRequestNode, injectNode, changeNode, endTestNode];
 
@@ -263,8 +285,9 @@ describe('CoapRequestNode', function() {
                 res.code = '4.01';
                 res.end('anything');
             });
-            server.listen(port);
-            helper.load(testNodes, flow);
+            helper.load(testNodes, flow, function(){
+                server.listen(port);
+            });
         });
 
         it('should export headers', function(done) {
@@ -300,10 +323,18 @@ describe('CoapRequestNode', function() {
 
             var etag = "@etag@";
 
-            var endTestNode = helper.endTestNode(done, function(msg) {
-                msg.should.have.property('headers')
-                    .with.property('ETag', etag);
-            });
+            function endTestNode(RED) {
+                function EndTestNode(n) {
+                    RED.nodes.createNode(this, n);
+                    this.on("input", function (msg) {
+                        msg.should.have
+                            .property("headers")
+                            .with.property("ETag", etag);
+                        done();
+                    });
+                }
+                RED.nodes.registerType("end-test-node", EndTestNode);
+            }
 
             var testNodes = [coapRequestNode, injectNode, changeNode, endTestNode];
 
@@ -312,8 +343,9 @@ describe('CoapRequestNode', function() {
                 res.setOption('ETag', etag);
                 res.end('anything');
             });
-            server.listen(port);
-            helper.load(testNodes, flow);
+            helper.load(testNodes, flow, function(){
+                server.listen(port);
+            });
         });
 
         it('should default to GET if no method is configured', function(done) {
@@ -345,12 +377,12 @@ describe('CoapRequestNode', function() {
 
             var server = coap.createServer();
             server.on('request', function(req, res) {
-                helper.endTest(done,function(){
-                    req.method.should.equal("GET");
-                });
+                req.method.should.equal("GET");
+                done();
             });
-            server.listen(port);
-            helper.load(testNodes, flow);
+            helper.load(testNodes, flow, function(){
+                server.listen(port);
+            });
         });
 
     });
@@ -395,12 +427,13 @@ describe('CoapRequestNode', function() {
 
         var server = coap.createServer();
         server.on('request', function(req, res) {
-            helper.endTest(done,function(){
-                req.url.should.equal("/test-resource");
-            });
+            req.url.should.equal("/test-resource");
+            done();
         });
-        server.listen(port);
-        helper.load(testNodes, flow);
+        
+        helper.load(testNodes, flow, function(){
+            server.listen(port);
+        });
     });
 
     it('should get resource updates after making GET request with "Observe" header', function(done) {
@@ -528,7 +561,7 @@ describe('CoapRequestNode', function() {
         }
 
         var testNodes = [coapRequestNode, injectNode, endTest];
-        helper.load(testNodes, flow);
+        helper.load(testNodes, flow, function(){});
 
     });
 
@@ -602,10 +635,11 @@ describe('CoapRequestNode', function() {
                                 .then(done, done); // looks a bit like black magic, but works because the previous line returns `undefined`
                         } catch (e) { done(e); }
                     });
-                    server.listen(port);
 
-                    var testNodes = [coapRequestNode, injectNode];
-                    helper.load(testNodes, flow);
+                    var testNodes = [coapRequestNode, injectNode];         
+                    helper.load(testNodes, flow, function(){
+                        server.listen(port);
+                    });
                 });
             }) (serializeFormatTests[i]);
         }
@@ -667,10 +701,22 @@ describe('CoapRequestNode', function() {
                                 },
                                ];
 
-                    var endTestNode = helper.endTestNode(done, function(msg) {
-                        Buffer.isBuffer(msg.payload).should.be.false;
-                        msg.payload.should.deepEqual(test.message);
-                    });
+                    function endTestNode(RED) {
+                        function EndTestNode(n) {
+                            RED.nodes.createNode(this, n);
+                            this.on("input", function (msg) {
+                                Buffer.isBuffer(
+                                    msg.payload
+                                ).should.be.false;
+                                msg.payload.should.deepEqual(test.message);
+                                done();
+                            });
+                        }
+                        RED.nodes.registerType(
+                            "end-test-node",
+                            EndTestNode
+                        );
+                    }
 
                     var server = coap.createServer();
                     server.on('request', function(req, res) {
@@ -679,10 +725,11 @@ describe('CoapRequestNode', function() {
                         res.setOption('Content-Format', test.format);
                         res.end(test.encode(test.message));
                     });
-                    server.listen(port);
 
                     var testNodes = [coapRequestNode, injectNode, endTestNode];
-                    helper.load(testNodes, flow);
+                    helper.load(testNodes, flow, function(){
+                        server.listen(port);
+                    });
                 });
             }) (deserializeFormatTests[i]);
         }
@@ -719,10 +766,17 @@ describe('CoapRequestNode', function() {
                         },
                        ];
 
-            var endTestNode = helper.endTestNode(done, function(msg) {
-                Buffer.isBuffer(msg.payload).should.be.true;
-                msg.payload.toString().should.equal(message);
-            });
+            function endTestNode(RED) {
+                function EndTestNode(n) {
+                    RED.nodes.createNode(this, n);
+                    this.on("input", function (msg) {
+                        Buffer.isBuffer(msg.payload).should.be.true;
+                        msg.payload.toString().should.equal(message);
+                        done();
+                    });
+                }
+                RED.nodes.registerType("end-test-node", EndTestNode);
+            }
 
             var testNodes = [coapRequestNode, injectNode, endTestNode];
             var message = "Got it!";
@@ -736,9 +790,9 @@ describe('CoapRequestNode', function() {
                 res.setOption('Content-Format', 'text/plain');
                 res.end(message);
             });
-            server.listen(port);
-
-            helper.load(testNodes, flow);
+            helper.load(testNodes, flow, function(){
+                server.listen(port);
+            });
         });
 
         it('should default to string for unknown content format', function(done) {
@@ -773,10 +827,17 @@ describe('CoapRequestNode', function() {
                         },
                        ];
 
-            var endTestNode = helper.endTestNode(done, function(msg) {
-                (typeof msg.payload).should.equal("string");
-                msg.payload.should.equal(message);
-            });
+            function endTestNode(RED) {
+                function EndTestNode(n) {
+                    RED.nodes.createNode(this, n);
+                    this.on("input", function (msg) {
+                        (typeof msg.payload).should.equal("string");
+                        msg.payload.should.equal(message);
+                        done();
+                    });
+                }
+                RED.nodes.registerType("end-test-node", EndTestNode);
+            }
 
             var testNodes = [coapRequestNode, injectNode, endTestNode];
             var message = "Got it!";
@@ -789,9 +850,10 @@ describe('CoapRequestNode', function() {
                 res.setOption('Content-Format', 'test/unknown');
                 res.end(message);
             });
-            server.listen(port);
 
-            helper.load(testNodes, flow);
+            helper.load(testNodes, flow, function(){
+                server.listen(port);
+            });
         });
     });
 });
