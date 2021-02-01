@@ -3,22 +3,39 @@
   "version": "0.3.0",
   "description": "CoAP support in Node-RED",
   "dependencies": {
-    "cbor": "^1.0.4",
-    "coap": "^0.16.0",
+    "cbor": "^6.0.1",
+    "coap": "^0.24.0",
     "h5.linkformat": "0.0.0",
-    "uri-js": "^3.0.2"
+    "uri-js": "^4.4.1"
   },
   "devDependencies": {
-    "express": "^4.13.4",
-    "grunt": "^1.0.1",
-    "grunt-cli": "^1.2.0",
-    "grunt-contrib-jshint": "^1.0.0",
-    "grunt-simple-mocha": "^0.4.0",
-    "mocha": "^2.0.1",
-    "node-red": "0.9.1-nocolors",
-    "should": "^9.0.0",
-    "sinon": "^1.12.2",
-    "when": "^3.6.4"
+    "coveralls": "^3.1.0",
+    "jshint": "^2.12.0",
+    "mocha": "^8.2.1",
+    "node-red": "^1.2.7",
+    "node-red-node-test-helper": "^0.2.5",
+    "nyc": "^15.1.0"
+  },
+  "scripts": {
+    "test": "nyc mocha --exit",
+    "coverage": "nyc report --reporter=lcov --reporter=text-summary",
+    "jshint": "jshint coap"
+  },
+  "mocha": {
+    "globals": [
+      "expect"
+    ],
+    "ignoreLeaks": false,
+    "ui": "bdd",
+    "reporter": "spec"
+  },
+  "jshintConfig": {
+    "curly": true,
+    "forin": true,
+    "immed": true,
+    "nonbsp": true,
+    "strict": true,
+    "loopfunc": true
   },
   "license": "MIT",
   "repository": {
@@ -52,6 +69,9 @@
     },
     {
       "name": "Justas Azna"
+    },
+    {
+      "name": "Jan Romann"
     }
   ]
 }
