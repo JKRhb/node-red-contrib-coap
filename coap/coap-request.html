@@ -30,7 +30,7 @@
     });
 </script>
 
-<script type="text/x-red" data-template-name="coap request">
+<script type="text/html" data-template-name="coap request">
     <div class="form-row">
         <label for="node-input-url"><i class="fa fa-globe"></i> URL</label>
         <input type="text" id="node-input-url" placeholder="coap://localhost/test"/>
@@ -70,7 +70,7 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="coap request">
+<script type="text/html" data-help-name="coap request">
     <p>Provides a node for making CoAP requests.</p>
 
     <p>URL, request method and content serialization format (<i>Content-Format</i>) can be configured. Also, you can add <i>Observe</i> header to your request. If the target endpoint supports <i>pub/sub</i>, you will get updated resource represantations in addition to the initial one (<a href="http://tools.ietf.org/html/draft-ietf-core-observe-11">draft-ietf-core-observe-11</a>)</p>
