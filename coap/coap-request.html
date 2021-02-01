@@ -1,7 +1,7 @@
 <script type="text/javascript">
     RED.nodes.registerType("coap request", {
         category: "function",
-        color: "#a6bbcf",
+        color: "rgb(215, 215, 160)",
         defaults: {
             method: {
                 value: "GET",
@@ -20,7 +20,7 @@
         inputs: 1,
         outputs: 1,
         icon: "white-globe.png",
-        align: "right",
+        align: "left",
         label: function () {
             return this.name || "coap request";
         },
