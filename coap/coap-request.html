@@ -32,99 +32,54 @@
 
 <script type="text/html" data-template-name="coap request">
     <div class="form-row">
-        <label for="node-input-url">
-            <i class="fa fa-globe"></i> URL
-        </label>
-        <input
-            type="text"
-            id="node-input-url"
-            placeholder="coap://localhost/test"
-        />
+        <label for="node-input-url"><i class="fa fa-globe"></i> URL</label>
+        <input type="text" id="node-input-url" placeholder="coap://localhost/test"/>
     </div>
     <div class="form-row">
-        <label for="node-input-method">
-            <i class="fa fa-tasks"></i> Method
-        </label>
+        <label for="node-input-method"><i class="fa fa-tasks"></i> Method</label>
         <select id="node-input-method">
-            <option value=""></option>
-            <option value="GET">GET</option>
-            <option value="PUT">PUT</option>
-            <option value="POST">POST</option>
-            <option value="DELETE">DELETE</option>
+          <option value=""></option>
+          <option value="GET">GET</option>
+          <option value="PUT">PUT</option>
+          <option value="POST">POST</option>
+          <option value="DELETE">DELETE</option>
         </select>
     </div>
     <div class="form-row">
         <!-- Empty label for alignment -->
-        <label />
-        <input
-            id="node-input-observe"
-            type="checkbox"
-            style="display: inline-block; width: auto; vertical-align: top;"
-        />
-        <label for="node-input-observe" style="width: auto; margin-right: 1em;">
-            Observe?
-        </label>
-        <input
-            id="node-input-raw-buffer"
-            type="checkbox"
-            style="display: inline-block; width: auto; vertical-align: top;"
-        />
-        <label
-            for="node-input-raw-buffer"
-            style="width: auto; margin-right: 1em;"
-        >
-            Raw buffer?
-        </label>
+        <label/>
+        <input id="node-input-observe" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;"/>
+        <label for="node-input-observe" style="width: auto; margin-right: 1em;">Observe?</label>
+        <input id="node-input-raw-buffer" type="checkbox" style="display: inline-block; width: auto; vertical-align: top;"/>
+        <label for="node-input-raw-buffer" style="width: auto; margin-right: 1em;">Raw buffer?</label>
     </div>
     <div class="form-row">
-        <label for="node-input-content-format"
-            ><i class="fa fa-file"></i> Content format
-        </label>
+        <label for="node-input-content-format"><i class="fa fa-file"></i> Content format</label>
         <select id="node-input-content-format">
-            <option>text/plain</option>
-            <option>application/json</option>
-            <option>application/cbor</option>
+          <option>text/plain</option>
+          <option>application/json</option>
+          <option>application/cbor</option>
         </select>
     </div>
     <div class="form-row">
-        <label for="node-input-name">
-            <i class="fa fa-tag"></i> Name
-        </label>
-        <input type="text" id="node-input-name" placeholder="foobar" />
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="foobar"/>
     </div>
     <div class="form-tips">
-        Tip: Leave url or method blank if you want to set them via msg
-        properties.
+        Tip: Leave url or method blank if you want to set them via msg properties.
     </div>
 </script>
 
 <script type="text/html" data-help-name="coap request">
     <p>Provides a node for making CoAP requests.</p>
 
-    <p>
-        URL, request method and content serialization format
-        (<i>Content-Format</i>) can be configured. Also, you can add
-        <i>Observe</i> header to your request. If the target endpoint supports
-        <i>pub/sub</i>, you will get updated resource represantations in
-        addition to the initial one 
-        (<a
-            href="http://tools.ietf.org/html/draft-ietf-core-observe-11"
-            >draft-ietf-core-observe-11</a
-        >)
-    </p>
+    <p>URL, request method and content serialization format (<i>Content-Format</i>) can be configured. Also, you can add <i>Observe</i> header to your request. If the target endpoint supports <i>pub/sub</i>, you will get updated resource represantations in addition to the initial one (<a href="http://tools.ietf.org/html/draft-ietf-core-observe-11">draft-ietf-core-observe-11</a>)</p>
 
     <p>The following properties may be set on the message object:</p>
 
     <ul>
-        <li>
-            <code>payload</code> will be sent in the body of the request. It
-            will be serialized using the format specified in the
-            <i>Content-Format</i> variable.
-        </li>
-        <li>
-            <code>method</code> will be used the node is configured to use it.
-            Defaults to <code>GET</code>
-        </li>
+        <li><code>payload</code> will be sent in the body of the request. It will be serialized using the format specified in the <i>Content-Format</i> variable.</li>
+        <li><code>method</code> will be used the node is configured to use it. Defaults to <code>GET</code></li>
         <li><code>url</code> will be used if no URL is configured.</li>
     </ul>
 </script>
