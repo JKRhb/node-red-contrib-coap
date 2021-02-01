@@ -33,6 +33,14 @@ describe("CoapInNode", function () {
                 url: "/test",
                 server: "coapServer1",
             },
+            {
+                id: "coapIn2",
+                type: "coap in",
+                method: "GET",
+                name: "coapIn",
+                url: "test2",
+                server: "coapServer1",
+            },
         ];
 
         //need to register nodes in order to use them
@@ -43,6 +51,9 @@ describe("CoapInNode", function () {
             coapIn1.options.should.have.property("name", "coapIn");
             coapIn1.options.should.have.property("url", "/test");
             coapIn1.options.should.have.property("server");
+
+            var coapIn2 = helper.getNode("coapIn2");
+            coapIn2.options.should.have.property("url", "/test2");
             done();
         });
     });
