@@ -53,7 +53,7 @@ module.exports = function (RED) {
                 exists = true;
 
                 //TODO: Does this have any effect? Should show the error in the frontend somehow? Some kind of status bar?
-                this.error(
+                node.error(
                     "Node with the specified URL and Method already exists!"
                 );
             }
@@ -103,7 +103,7 @@ module.exports = function (RED) {
         if (this.serverConfig) {
             this.serverConfig.registerInputNode(this);
         } else {
-            this.error("Missing server configuration");
+            node.error("Missing server configuration");
         }
     }
     RED.nodes.registerType("coap in", CoapInNode);
