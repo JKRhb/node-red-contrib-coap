@@ -2,13 +2,13 @@
 <script type="text/html" data-template-name="coap-server">
     <div class="form-row">
         <label for="node-config-input-name">
-            <i class="fa fa-bookmark"></i> Name
+            <i class="fa fa-bookmark"></i> <span data-i18n="coapServer.configInputName.label"></span>
         </label>
-        <input type="text" id="node-config-input-name" placeholder="Name" />
+        <input type="text" id="node-config-input-name" data-i18n="[placeholder]coapServer.configInputName.placeholder" />
     </div>
     <div class="form-row">
         <label for="node-config-input-ipv6">
-            <i class="fa fa-cog"></i> Support IPv6
+            <i class="fa fa-cog"></i> <span data-i18n="coapServer.configInputIPv6.label"></span>
         </label>
         <input
             type="checkbox"
@@ -17,19 +17,12 @@
         />
     </div>
     <div class="form-row">
-        <label for="node-config-input-port">Port</label>
+        <label for="node-config-input-port"><span data-i18n="coapServer.configInputPort.label"></span></label>
         <input type="text" id="node-config-input-port" placeholder="5683" />
-        <div class="form-tips">
-            <em>CoAP</em> is based on <em>UDP</em> so you may need to open a
-            <em>UDP</em> port in your firewall.
-        </div>
     </div>
-</script>
-
-<script type="text/html" data-help-name="coap-server">
-    <p>
-        This configuration node creates a CoAP Server using the specified UDP port
-    </p>
+    <div class="form-tips">
+        <span data-i18n="[html]coapServer.tip">
+    </div>
 </script>
 
 <script type="text/javascript">
@@ -59,13 +52,13 @@
 <script type="text/html" data-template-name="coap in">
     <div class="form-row">
         <label for="node-input-server">
-            <i class="fa fa-bookmark"></i> Server
+            <i class="fa fa-bookmark"></i> <span data-i18n="coapIn.inputServer.label"></span>
         </label>
         <input type="text" id="node-input-server" />
     </div>
     <div class="form-row">
         <label for="node-input-method">
-            <i class="fa fa-tasks"></i> Method
+            <i class="fa fa-tasks"></i> <span data-i18n="coapIn.inputMethod.label"></span>
         </label>
         <select id="node-input-method">
             <option value="GET">GET</option>
@@ -75,28 +68,13 @@
         </select>
     </div>
     <div class="form-row">
-        <label for="node-input-url"><i class="fa fa-tag"></i> url</label>
-        <input type="text" id="node-input-url" placeholder="/foo" />
+        <label for="node-input-url"><i class="fa fa-tag"></i> <span data-i18n="coapIn.inputURL.label"></span></label>
+        <input type="text" id="node-input-url" data-i18n="[placeholder]coapIn.inputURL.placeholder" />
     </div>
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name" />
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="coapIn.inputName.label"></span></label>
+        <input type="text" id="node-input-name"  data-i18n="[placeholder]coapIn.inputName.placeholder" />
     </div>
-</script>
-
-<script type="text/html" data-help-name="coap in">
-    <p>Provides a node for defining resources on local CoAP servers.</p>
-
-    <p>
-        The resulting message has the following properties:
-        <ul>
-            <li>msg.req : coap request</li>
-            <li>msg.res : coap response</li>
-        </ul>
-    </p>
-    <p>
-        See <a href="https://github.com/mcollina/node-coap">node-coap</a> for more details on how to handle requests.
-    </p>
 </script>
 
 <script type="text/javascript">

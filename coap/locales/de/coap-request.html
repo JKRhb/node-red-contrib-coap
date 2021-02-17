@@ -1,0 +1,30 @@
+<script type="text/html" data-help-name="coap request">
+    <p>Stellt einen Node für das Versenden von CoAP-Anfragen zur Verfügung.</p>
+
+    <p>
+        Der URL, die Anfrage-Methode sowie das Format der Inhaltsserialisierung
+        (<em>Content-Format</em>) können konfiguriert werden. Zudem kann man einen
+        <em>Observe</em>-Header zur Anfrage hinzufügen. Wenn der Ziel-Endpoint <em>pub/sub</em>
+        unterstützt, werden Sie zusätzlich zur ursprünglich angefragten 
+        aktualisierte Ressourcen-Repräsentationen erhalten (<a
+            href="http://tools.ietf.org/html/draft-ietf-core-observe-11"
+        >
+            draft-ietf-core-observe-11 </a
+        >).
+    </p>
+
+    <p>Die folgenden Eigenschaften können für das Nachrichtenobjekt (<code>msg</code>) festgelegt werden:</p>
+
+    <ul>
+        <li>
+            Eine <code>payload</code> (die Nutzdaten), die im <em>Body</em> der Anfrage mitgesendet wird.
+            Sie wird gemäß dem Format serialisiert, das in der <em>Content-Format</em>-Variable festgelegt wurde.
+        </li>
+        <li>
+            In Anfragen wird die im Node definierte Methode genutzt.
+            Ist diese leer, wird die Methode des Nachrichtenobjektes verwendet.
+            Ist hier ebenfalls keine Methode gesetzt, wird standardmäßig <code>GET</code> verwendet.
+        </li>
+        <li>Das Feld <code>url</code> wird genutzt, wenn kein URL im Node konfiguriert ist.</li>
+    </ul>
+</script>

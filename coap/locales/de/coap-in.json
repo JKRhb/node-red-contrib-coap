@@ -1,0 +1,31 @@
+{
+    "coapIn": {
+        "inputName": {
+            "label": "Name",
+            "placeholder": "Name"
+        },
+        "inputURL": {
+            "label": "URL",
+            "placeholder": "/foo"
+        },
+        "inputMethod": {
+            "label": "Methode"
+        },
+        "inputServer": {
+            "label": "Server"
+        }
+    },
+    "coapServer": {
+        "configInputName": {
+            "label": "Name",
+            "placeholder": "Name"
+        },
+        "configInputIPv6": {
+            "label": "IPv6 unterstützen"
+        },
+        "configInputPort": {
+            "label": "Port"
+        },
+        "tip": "<em>CoAP</em> basiert auf <em>UDP</em>, weshalb es sein kann, dass Sie einen <em>UDP</em>-Port in Ihrer Firewall öffnen müssen."
+    }
+}
