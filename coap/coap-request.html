@@ -32,16 +32,16 @@
 
 <script type="text/html" data-template-name="coap request">
     <div class="form-row">
-        <label for="node-input-url"> <i class="fa fa-globe"></i> URL </label>
+        <label for="node-input-url"> <i class="fa fa-globe"></i> <span data-i18n="coapRequest.inputURL.label"></span> </label>
         <input
             type="text"
             id="node-input-url"
-            placeholder="coap://localhost/test"
+            data-i18n="[placeholder]coapRequest.inputURL.placeholder"
         />
     </div>
     <div class="form-row">
         <label for="node-input-method">
-            <i class="fa fa-tasks"></i> Method
+            <i class="fa fa-tasks"></i> <span data-i18n="coapRequest.inputMethod.label"></span>
         </label>
         <select id="node-input-method">
             <option value=""></option>
@@ -60,7 +60,7 @@
             style="display: inline-block; width: auto; vertical-align: top;"
         />
         <label for="node-input-observe" style="width: auto; margin-right: 1em;">
-            Observe?
+            <span data-i18n="coapRequest.inputObserve.label"></span>
         </label>
         <input
             id="node-input-raw-buffer"
@@ -71,12 +71,12 @@
             for="node-input-raw-buffer"
             style="width: auto; margin-right: 1em;"
         >
-            Raw buffer?
+        <span data-i18n="coapRequest.inputRawBuffer.label"></span>
         </label>
     </div>
     <div class="form-row">
         <label for="node-input-content-format">
-            <i class="fa fa-file"></i> Content format
+            <i class="fa fa-file"></i> <span data-i18n="coapRequest.inputContentFormat.label"></span>
         </label>
         <select id="node-input-content-format">
             <option>text/plain</option>
@@ -85,42 +85,11 @@
         </select>
     </div>
     <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="foobar" />
+        <label for="node-input-name"><i class="fa fa-tag"></i> <span data-i18n="coapRequest.inputName.label"></label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]coapRequest.inputName.placeholder" />
     </div>
     <div class="form-tips">
-        Tip: Leave url or method blank if you want to set them via msg
-        properties.
+        <span data-i18n="[html]coapRequest.tip">
     </div>
 </script>
 
-<script type="text/html" data-help-name="coap request">
-    <p>Provides a node for making CoAP requests.</p>
-
-    <p>
-        URL, request method and content serialization format
-        (<em>Content-Format</em>) can be configured. Also, you can add
-        <em>Observe</em> header to your request. If the target endpoint supports
-        <em>pub/sub</em>, you will get updated resource represantations in
-        addition to the initial one (<a
-            href="http://tools.ietf.org/html/draft-ietf-core-observe-11"
-        >
-            draft-ietf-core-observe-11 </a
-        >).
-    </p>
-
-    <p>The following properties may be set on the message object:</p>
-
-    <ul>
-        <li>
-            <code>payload</code> will be sent in the body of the request. It
-            will be serialized using the format specified in the
-            <em>Content-Format</em> variable.
-        </li>
-        <li>
-            <code>method</code> will be used the node is configured to use it.
-            Defaults to <code>GET</code>
-        </li>
-        <li><code>url</code> will be used if no URL is configured.</li>
-    </ul>
-</script>

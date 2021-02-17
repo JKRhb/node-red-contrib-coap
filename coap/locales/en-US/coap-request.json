@@ -1,0 +1,25 @@
+{
+    "coapRequest": {
+        "inputName": {
+            "label": "Name",
+            "placeholder": "foobar"
+        },
+        "inputURL": {
+            "label": "URL",
+            "placeholder": "coap://localhost/test"
+        },
+        "inputMethod": {
+            "label": "Method"
+        },
+        "inputObserve": {
+            "label": "Observe?"
+        },
+        "rawBuffer": {
+            "label": "Raw buffer?"
+        },
+        "contentFormat": {
+            "label": "Content format"
+        },
+        "tip": "Tip: Leave url or method blank if you want to set them via msg properties."
+    }
+}
