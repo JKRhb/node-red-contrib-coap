@@ -1,5 +1,6 @@
 {
     "coapRequest": {
+        "nodeLabel": "coap request",
         "inputName": {
             "label": "Name",
             "placeholder": "foobar"
