@@ -20,6 +20,7 @@ module.exports = function (RED) {
         node.options.url = n.url;
         node.options.contentFormat = n["content-format"];
         node.options.rawBuffer = n["raw-buffer"];
+        node.options.multicast = n.multicast;
 
         function _constructPayload(msg, contentFormat) {
             var payload = null;
@@ -45,6 +46,8 @@ module.exports = function (RED) {
             ).toUpperCase();
             reqOpts.headers = {};
             reqOpts.headers["Content-Format"] = node.options.contentFormat;
+            reqOpts.multicast = node.options.multicast;
+            reqOpts.multicastTimeout = node.options.multicastTimeout;
 
             function _onResponse(res) {
                 function _send(payload) {
