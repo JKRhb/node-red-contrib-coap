@@ -60,7 +60,7 @@ module.exports = function (RED) {
             reqOpts.multicastTimeout = node.options.multicastTimeout || msg.multicastTimeout;
             var acceptedContentFormat = node.options.accept || msg.accept;
             if (acceptedContentFormat) {
-                reqOpts.headers['Accept'] = acceptedContentFormat;
+                reqOpts.headers.Accept = acceptedContentFormat;
             }
 
             function _onResponse(res) {
