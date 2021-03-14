@@ -21,12 +21,22 @@ module.exports = function (RED) {
         node.options.contentFormat = n["content-format"];
         node.options.rawBuffer = n["raw-buffer"];
         node.options.multicast = n.multicast;
+        node.options.accept = n.accept || "";
 
         function _constructPayload(msg, contentFormat) {
             var payload = null;
 
             if (contentFormat === "text/plain") {
-                payload = msg.payload;
+                if (
+                    typeof msg.payload === "string" ||
+                    Buffer.isBuffer(msg.payload)
+                ) {
+                    payload = msg.payload;
+                } else if (typeof msg.payload == "number") {
+                    payload = msg.payload + "";
+                } else {
+                    payload = JSON.stringify(msg.payload);
+                }
             } else if (contentFormat === "application/json") {
                 payload = JSON.stringify(msg.payload);
             } else if (contentFormat === "application/cbor") {
@@ -46,8 +56,12 @@ module.exports = function (RED) {
             ).toUpperCase();
             reqOpts.headers = {};
             reqOpts.headers["Content-Format"] = node.options.contentFormat;
-            reqOpts.multicast = node.options.multicast;
-            reqOpts.multicastTimeout = node.options.multicastTimeout;
+            reqOpts.multicast = node.options.multicast || msg.multicast;
+            reqOpts.multicastTimeout = node.options.multicastTimeout || msg.multicastTimeout;
+            var acceptedContentFormat = node.options.accept || msg.accept;
+            if (acceptedContentFormat) {
+                reqOpts.headers['Accept'] = acceptedContentFormat;
+            }
 
             function _onResponse(res) {
                 function _send(payload) {

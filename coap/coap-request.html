@@ -16,6 +16,7 @@
             multicastTimeout: { value: 20000, required: false },
             url: { value: "" },
             "content-format": { value: "text/plain" },
+            "accept": { required: false },
             "raw-buffer": { value: false, required: true },
             name: { value: "" },
         },
@@ -79,6 +80,17 @@
             <i class="fa fa-file"></i> <span data-i18n="coapRequest.inputContentFormat.label"></span>
         </label>
         <select id="node-input-content-format">
+            <option>text/plain</option>
+            <option>application/json</option>
+            <option>application/cbor</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-accept">
+            <i class="fa fa-file"></i> <span data-i18n="coapRequest.inputAccept.label"></span>
+        </label>
+        <select id="node-input-accept">
+            <option></option>
             <option>text/plain</option>
             <option>application/json</option>
             <option>application/cbor</option>

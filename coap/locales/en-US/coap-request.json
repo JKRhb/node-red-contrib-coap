@@ -27,6 +27,9 @@
         "contentFormat": {
             "label": "Content format"
         },
+        "inputAccept": {
+            "label": "Accept option"
+        },
         "tip": "Tip: Leave url or method blank if you want to set them via msg properties."
     }
 }

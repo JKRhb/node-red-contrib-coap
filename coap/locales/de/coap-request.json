@@ -27,6 +27,9 @@
         "inputContentFormat": {
             "label": "Content-Format"
         },
+        "inputAccept": {
+            "label": "Accept-Option"
+        },
         "tip": "Tipp: Lassen Sie den URL oder die Methode leer, wenn Sie diese über msg-Eigenschaften definieren wollen."
     }
 }
