@@ -1,9 +1,11 @@
 {
-    "coapIn": {
+    "common": {
         "inputName": {
             "label": "Name",
             "placeholder": "Name"
-        },
+        }
+    },
+    "coapIn": {
         "inputURL": {
             "label": "URL",
             "placeholder": "/url"
@@ -15,11 +17,16 @@
             "label": "Server"
         }
     },
-    "coapServer": {
-        "configInputName": {
-            "label": "Name",
-            "placeholder": "Name"
+    "coapResponse": {
+        "statusCode": {
+            "label": "Status-Code"
         },
+        "contentFormat": {
+            "label": "Content-Format"
+        },
+        "tip": "Die an diesen Node gesendeten Nachrichten <strong>müssen</strong> von einem <em>coap-Input</em>-Node stammen"
+    },
+    "coapServer": {
         "configInputIPv6": {
             "label": "UDP6-Agent verwenden"
         },
