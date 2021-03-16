@@ -21,10 +21,10 @@
         "inputObserve": {
             "label": "Observe?"
         },
-        "rawBuffer": {
+        "inputRawBuffer": {
             "label": "Raw buffer?"
         },
-        "contentFormat": {
+        "inputContentFormat": {
             "label": "Content format"
         },
         "inputAccept": {
