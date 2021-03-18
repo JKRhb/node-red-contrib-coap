@@ -21,7 +21,7 @@
             "placeholder": "Name"
         },
         "configInputIPv6": {
-            "label": "Support IPv6"
+            "label": "Use UDP6 agent"
         },
         "configInputPort": {
             "label": "Port"
