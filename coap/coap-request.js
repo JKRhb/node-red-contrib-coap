@@ -6,8 +6,6 @@ module.exports = function (RED) {
     var url = require("uri-js");
     var linkFormat = require("h5.linkformat");
 
-    coap.registerFormat("application/cbor", 60);
-
     function CoapRequestNode(n) {
         RED.nodes.createNode(this, n);
         var node = this;
