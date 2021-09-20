@@ -29,32 +29,6 @@ describe("CoapRequestNode", function () {
         });
     });
 
-    it("should be loaded", function (done) {
-        var flow = [
-            {
-                id: "coapRequest1",
-                type: "coap request",
-                "content-format": "application/json",
-                method: "POST",
-                name: "coapRequestPost",
-                observe: false,
-                url: "/test-resource",
-            },
-        ];
-
-        helper.load([coapRequestNode], flow, function () {
-            var coapRequest1 = helper.getNode("coapRequest1");
-            coapRequest1.options.should.have.property("method", "POST");
-            coapRequest1.options.should.have.property(
-                "name",
-                "coapRequestPost"
-            );
-            coapRequest1.options.should.have.property("observe", false);
-            coapRequest1.options.should.have.property("url", "/test-resource");
-            done();
-        });
-    });
-
     describe("Methods", function () {
         var methodTests = [
             { method: "GET", message: "You get me, buddy" },
