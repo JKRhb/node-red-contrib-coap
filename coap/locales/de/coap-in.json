@@ -6,7 +6,7 @@
         },
         "inputURL": {
             "label": "URL",
-            "placeholder": "/foo"
+            "placeholder": "/url"
         },
         "inputMethod": {
             "label": "Methode"

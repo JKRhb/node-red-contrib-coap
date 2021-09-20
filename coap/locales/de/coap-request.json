@@ -7,7 +7,7 @@
         },
         "inputURL": {
             "label": "URL",
-            "placeholder": "coap://localhost/test"
+            "placeholder": "coap://"
         },
         "inputMethod": {
             "label": "Methode"
