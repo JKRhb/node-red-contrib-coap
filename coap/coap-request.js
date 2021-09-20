@@ -5,19 +5,9 @@ module.exports = function (RED) {
     var cbor = require("cbor");
     var linkFormat = require("h5.linkformat");
 
-    function CoapRequestNode(n) {
-        RED.nodes.createNode(this, n);
+    function CoapRequestNode(config) {
+        RED.nodes.createNode(this, config);
         var node = this;
-
-        // copy "coap request" configuration locally
-        node.options = {};
-        node.options.method = n.method;
-        node.options.observe = n.observe;
-        node.options.name = n.name;
-        node.options.url = n.url;
-        node.options.contentFormat = n["content-format"];
-        node.options.rawBuffer = n["raw-buffer"];
-        node.options.multicast = n.multicast;
 
         function _constructPayload(msg, contentFormat) {
             var payload = null;
@@ -34,7 +24,7 @@ module.exports = function (RED) {
         }
 
         function _makeRequest(msg) {
-            var url = new URL(node.options.url || msg.url);
+            var url = new URL(config.url || msg.url);
 
             var reqOpts = {
                 hostname: url.hostname,
@@ -43,14 +33,14 @@ module.exports = function (RED) {
                 query: url.search.substring(1),
             };
             reqOpts.method = (
-                node.options.method ||
+                config.method ||
                 msg.method ||
                 "GET"
             ).toUpperCase();
             reqOpts.headers = {};
-            reqOpts.headers["Content-Format"] = node.options.contentFormat;
-            reqOpts.multicast = node.options.multicast;
-            reqOpts.multicastTimeout = node.options.multicastTimeout;
+            reqOpts.headers["Content-Format"] = config["content-format"];
+            reqOpts.multicast = config.multicast;
+            reqOpts.multicastTimeout = config.multicastTimeout;
 
             function _onResponse(res) {
                 function _send(payload) {
@@ -64,7 +54,7 @@ module.exports = function (RED) {
                 }
 
                 function _onResponseData(data) {
-                    if (node.options.rawBuffer) {
+                    if (config["raw-buffer"]) {
                         _send(data);
                     } else if (res.headers["Content-Format"] === "text/plain") {
                         _send(data.toString());
@@ -72,7 +62,7 @@ module.exports = function (RED) {
                         res.headers["Content-Format"] === "application/json"
                     ) {
                         try {
-                            _send(JSON.parse(data.toString()));   
+                            _send(JSON.parse(data.toString()));
                         } catch (error) {
                             node.error(error.message);
                         }
@@ -102,9 +92,9 @@ module.exports = function (RED) {
                 }
             }
 
-            var payload = _constructPayload(msg, node.options.contentFormat);
+            var payload = _constructPayload(msg, config["content-format"]);
 
-            if (node.options.observe === true) {
+            if (config.observe === true) {
                 reqOpts.observe = "1";
             } else {
                 delete reqOpts.observe;
