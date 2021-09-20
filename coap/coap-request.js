@@ -3,7 +3,6 @@ module.exports = function (RED) {
 
     var coap = require("coap");
     var cbor = require("cbor");
-    var url = require("uri-js");
     var linkFormat = require("h5.linkformat");
 
     function CoapRequestNode(n) {
@@ -35,8 +34,14 @@ module.exports = function (RED) {
         }
 
         function _makeRequest(msg) {
-            var reqOpts = url.parse(node.options.url || msg.url);
-            reqOpts.pathname = reqOpts.path;
+            var url = new URL(node.options.url || msg.url);
+
+            var reqOpts = {
+                hostname: url.hostname,
+                pathname: url.pathname,
+                port: url.port,
+                query: url.search.substring(1),
+            };
             reqOpts.method = (
                 node.options.method ||
                 msg.method ||
