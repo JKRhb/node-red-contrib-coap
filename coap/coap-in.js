@@ -3,22 +3,15 @@ module.exports = function (RED) {
     var coap = require("coap");
 
     // A node red node that sets up a local coap server
-    function CoapServerNode(n) {
-        // Create a RED node
-        RED.nodes.createNode(this, n);
+    function CoapServerNode(config) {
+        RED.nodes.createNode(this, config);
         var node = this;
-
-        // Store local copies of the node configuration (as defined in the .html)
-        node.options = {};
-        node.options.name = n.name;
-        node.options.port = n.port;
-        node.options.ipv6 = n.ipv6;
 
         node._inputNodes = []; // collection of "coap in" nodes that represent coap resources
 
         // Setup node-coap server and start
         var serverSettings = {};
-        if (node.options.ipv6) {
+        if (config.ipv6) {
             serverSettings.type = "udp6";
         } else {
             serverSettings.type = "udp4";
@@ -31,8 +24,7 @@ module.exports = function (RED) {
                 node.log(err);
             });
         });
-        node.server.listen(node.options.port, function () {
-            //console.log('server started');
+        node.server.listen(config.port, function () {
             node.log("CoAP Server Started");
         });
 
@@ -88,22 +80,22 @@ module.exports = function (RED) {
         }
     };
 
-    function CoapInNode(n) {
-        RED.nodes.createNode(this, n);
+    function CoapInNode(config) {
+        RED.nodes.createNode(this, config);
+        var node = this;
 
-        //copy "coap in" node configuration locally
-        this.options = {};
-        this.options.method = n.method;
-        this.options.name = n.name;
-        this.options.server = n.server;
-        this.options.url = n.url.charAt(0) == "/" ? n.url : "/" + n.url;
+        node.options = {};
+        node.options.method = config.method;
+        node.options.name = config.name;
+        node.options.server = config.server;
+        node.options.url = config.url.charAt(0) == "/" ? config.url : "/" + config.url;
 
-        this.serverConfig = RED.nodes.getNode(this.options.server);
+        var serverConfig = RED.nodes.getNode(config.server);
 
-        if (this.serverConfig) {
-            this.serverConfig.registerInputNode(this);
+        if (serverConfig) {
+            serverConfig.registerInputNode(node);
         } else {
-            this.error("Missing server configuration");
+            node.error("Missing server configuration");
         }
     }
     RED.nodes.registerType("coap in", CoapInNode);
