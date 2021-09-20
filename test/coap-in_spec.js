@@ -1,7 +1,6 @@
 var should = require("should");
 
 var coap = require("coap");
-var url = require("url");
 var coapInNode = require("../coap/coap-in.js");
 var functionNode = require("@node-red/nodes/core/function/10-function.js");
 var helper = require("node-red-node-test-helper");
@@ -70,10 +69,7 @@ describe("CoapInNode", function () {
 
         // Need to register nodes in order to use them
         helper.load(coapInNode, flow, function () {
-            var urlStr = "coap://localhost:8888/unregistered";
-            var opts = url.parse(urlStr);
-            opts.method = "GET";
-            var req = coap.request(opts);
+            var req = coap.request("coap://localhost:8888/unregistered");
 
             req.on("response", function (res) {
                 res.code.should.equal("4.04");
@@ -144,11 +140,8 @@ describe("CoapInNode", function () {
                             // Need to register nodes in order to use them
                             var testNodes = [functionNode, coapInNode];
                             helper.load(testNodes, flow, function () {
-                                var urlStr =
-                                    "coap://" + serverAddress + ":8888/test";
-                                var opts = url.parse(urlStr);
-                                opts.method = test.method;
-                                var req = coap.request(opts);
+                                var req = coap.request("coap://" + serverAddress + ":8888/test");
+                                req.statusCode = test.method;
 
                                 req.on("response", function (res) {
                                     res.payload
@@ -185,10 +178,8 @@ describe("CoapInNode", function () {
             // Need to register nodes in order to use them
             var testNodes = [functionNode, coapInNode];
             helper.load(testNodes, flow, function () {
-                var urlStr = "coap://localhost:8888/test";
-                var opts = url.parse(urlStr);
-                opts.method = "PUT";
-                var req = coap.request(opts);
+                var req = coap.request("coap://localhost:8888/test");
+                req.statusCode = "PUT"
 
                 req.on("response", function (res) {
                     res.code.should.equal("4.05");

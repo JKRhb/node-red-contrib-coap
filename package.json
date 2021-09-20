@@ -5,8 +5,7 @@
   "dependencies": {
     "cbor": "^8.0.0",
     "coap": "^0.25.0",
-    "h5.linkformat": "0.0.0",
-    "uri-js": "^4.4.1"
+    "h5.linkformat": "0.0.0"
   },
   "devDependencies": {
     "coveralls": "^3.1.1",
