@@ -36,35 +36,37 @@ module.exports = function (RED) {
     RED.nodes.registerType("coap-server", CoapServerNode);
 
     CoapServerNode.prototype.registerInputNode = function (inputNode) {
+        var node = this;
         var exists = false;
-        for (var i = 0; i < this._inputNodes.length; i++) {
+        for (var i = 0; i < node._inputNodes.length; i++) {
             if (
-                this._inputNodes[i].options.url == inputNode.options.url &&
-                this._inputNodes[i].options.method == inputNode.options.method
+                node._inputNodes[i].options.url == inputNode.options.url &&
+                node._inputNodes[i].options.method == inputNode.options.method
             ) {
                 exists = true;
 
                 //TODO: Does this have any effect? Should show the error in the frontend somehow? Some kind of status bar?
-                this.error(
+                node.error(
                     "Node with the specified URL and Method already exists!"
                 );
             }
         }
         if (!exists) {
-            this._inputNodes.push(inputNode);
+            node._inputNodes.push(inputNode);
         }
     };
 
     CoapServerNode.prototype.handleRequest = function (req, res) {
         //TODO: Check if there are any matching resource. If the resource is .well-known return the resource directory to the client
+        var node = this;
         var matchResource = false;
         var matchMethod = false;
-        for (var i = 0; i < this._inputNodes.length; i++) {
-            if (this._inputNodes[i].options.url == req.url) {
+        for (var i = 0; i < node._inputNodes.length; i++) {
+            if (node._inputNodes[i].options.url == req.url) {
                 matchResource = true;
-                if (this._inputNodes[i].options.method == req.method) {
+                if (node._inputNodes[i].options.method == req.method) {
                     matchMethod = true;
-                    var inNode = this._inputNodes[i];
+                    var inNode = node._inputNodes[i];
                     inNode.send({ req: req, res: res });
                 }
             }
