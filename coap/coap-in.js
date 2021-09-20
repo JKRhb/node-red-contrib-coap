@@ -35,12 +35,12 @@ module.exports = function (RED) {
     }
     RED.nodes.registerType("coap-server", CoapServerNode);
 
-    CoapServerNode.prototype.registerInputNode = function (/*Node*/ resource) {
+    CoapServerNode.prototype.registerInputNode = function (inputNode) {
         var exists = false;
         for (var i = 0; i < this._inputNodes.length; i++) {
             if (
-                this._inputNodes[i].options.url == resource.options.url &&
-                this._inputNodes[i].options.method == resource.options.method
+                this._inputNodes[i].options.url == inputNode.options.url &&
+                this._inputNodes[i].options.method == inputNode.options.method
             ) {
                 exists = true;
 
@@ -51,7 +51,7 @@ module.exports = function (RED) {
             }
         }
         if (!exists) {
-            this._inputNodes.push(resource);
+            this._inputNodes.push(inputNode);
         }
     };
 
