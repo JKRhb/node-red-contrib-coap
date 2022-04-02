@@ -72,5 +72,8 @@
     {
       "name": "Jan Romann"
     }
-  ]
+  ],
+  "engines": {
+    "node": ">=12"
+  }
 }
