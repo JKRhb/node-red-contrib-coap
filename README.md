@@ -11,6 +11,13 @@ Functionality
 -------------
  We introduce "coap request", "coap in", and "coap response" nodes which can be used in a similar fashion to "http request", "http in", and "http reponse" nodes from Node-RED's core.
 
+## Requirements
+
+This module requires at least Node version 12.
+This might require you to upgrade the pre-installed Node version on platforms like Beaglebone[^1]
+
+[^1]: See [this issue comment](https://github.com/JKRhb/node-red-contrib-coap/issues/40#issuecomment-1086693878) for information on how to upgrade the node version on BeagleBone.
+
 Install
 -------
 
