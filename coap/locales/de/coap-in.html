@@ -14,6 +14,21 @@
     </p>
 </script>
 
+<script type="text/html" data-help-name="coap response">
+    <p>Stellt einen Node für das Senden der Antwort eines CoAP-Servers bereit.</p>
+
+    <p>
+        Sie können das <code>Content-Format</code> der Antwort entweder für über die Einstellungen dieses Nodes festlegen
+        oder über das <code>contentFormat</code>-Feld des <code>msg</code>-Objekts.
+        Erlaubte Werte sind <code>text/plain</code>, <code>application/json</code>, oder <code>application/cbor</code>.
+    </p>
+
+    <p>
+        Siehe <a href="https://github.com/mcollina/node-coap">node-coap</a> für mehr Informationen dazu, wie Antworten gehandhabt
+        werden können.
+    </p>
+</script>
+
 <script type="text/html" data-help-name="coap-server">
     <p>
         Dieser Konfigurationsnode erzeugt einen CoAP-Server, der den angegebenen UDP-Port verwendet.
