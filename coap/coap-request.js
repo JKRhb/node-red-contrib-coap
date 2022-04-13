@@ -23,11 +23,28 @@ module.exports = function (RED) {
             return payload;
         }
 
-        function _makeRequest(msg) {
-            var url = new URL(config.url || msg.url);
+        /**
+         * Cleans up the hostname of the passed in `URL` object if it should
+         * be an IPv6 address and returns the result.
+         *
+         * @param {URL} url
+         * @returns The cleaned up hostname.
+         */
+        function _determineHostname(url) {
+            const hostname = url.hostname;
+            if (hostname.startsWith("[") && hostname.endsWith("]")) {
+                return hostname.substring(1, hostname.length - 1);
+            }
 
-            var reqOpts = {
-                hostname: url.hostname,
+            return hostname;
+        }
+
+        function _makeRequest(msg) {
+            const url = new URL(config.url || msg.url);
+            const hostname = _determineHostname(url);
+
+            const reqOpts = {
+                hostname,
                 pathname: url.pathname,
                 port: url.port,
                 query: url.search.substring(1),
