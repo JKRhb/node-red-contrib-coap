@@ -160,6 +160,62 @@ describe("CoapRequestNode", function () {
             });
         });
 
+        it("should be able to use IPv6 for requests", function (done) {
+            const port = getPort();
+            const flow = [
+                {
+                    id: "n1",
+                    type: "inject",
+                    name: "inject",
+                    payload: "",
+                    payloadType: "none",
+                    repeat: "",
+                    crontab: "",
+                    once: true,
+                    wires: [["n2"]],
+                },
+                {
+                    id: "n2",
+                    type: "coap request",
+                    "content-format": "text/plain",
+                    method: "GET",
+                    name: "coapRequest",
+                    observe: false,
+                    url: "coap://[::1]:" + port + "/test-resource",
+                    wires: [["n3"]],
+                },
+                {
+                    id: "n3",
+                    type: "end-test-node",
+                    name: "end-test-node",
+                },
+            ];
+
+            const testMessage = "Hello :)";
+
+            function endTestNode(RED) {
+                function EndTestNode(n) {
+                    RED.nodes.createNode(this, n);
+                    this.on("input", function (msg) {
+                        msg.payload.toString().should.equal(testMessage);
+                        done();
+                    });
+                }
+                RED.nodes.registerType("end-test-node", EndTestNode);
+            }
+            const testNodes = [coapRequestNode, injectNode, endTestNode];
+
+            const server = coap.createServer({type: "udp6"});
+            server.on("request", function (req, res) {
+                res.setOption("Content-Format", "text/plain");
+                req.url.should.equal("/test-resource");
+                res.end(testMessage);
+            });
+            helper.load(testNodes, flow, function () {
+                server.listen(port);
+            });
+        });
+
         it("should preserve message properties", function (done) {
             var port = getPort();
             var flow = [
@@ -565,7 +621,7 @@ describe("CoapRequestNode", function () {
         }
 
         var testNodes = [coapRequestNode, injectNode, endTest];
-        helper.load(testNodes, flow, function () { });
+        helper.load(testNodes, flow, function () {});
     });
 
     describe("Content formats", function () {
@@ -609,8 +665,8 @@ describe("CoapRequestNode", function () {
             (function (test) {
                 it(
                     "should be able to serialize `" +
-                    test.format +
-                    "` request payload",
+                        test.format +
+                        "` request payload",
                     function (done) {
                         var port = getPort();
 
@@ -700,8 +756,8 @@ describe("CoapRequestNode", function () {
             (function (test) {
                 it(
                     "should be able to deserialize `" +
-                    test.format +
-                    "` response payload",
+                        test.format +
+                        "` response payload",
                     function (done) {
                         var port = getPort();
 
@@ -899,7 +955,7 @@ describe("CoapRequestNode", function () {
 
         it("should be able to process multiple responses if the multicast option is set", function (done) {
             var port = getPort();
-            var MULTICAST_ADDR = '224.0.0.1';
+            var MULTICAST_ADDR = "224.0.0.1";
             var flow = [
                 {
                     id: "n1",
@@ -921,7 +977,12 @@ describe("CoapRequestNode", function () {
                     observe: false,
                     "raw-buffer": false,
                     multicast: true,
-                    url: "coap://" + MULTICAST_ADDR  + ":" + port + "/test-resource",
+                    url:
+                        "coap://" +
+                        MULTICAST_ADDR +
+                        ":" +
+                        port +
+                        "/test-resource",
                     wires: [["n3"]],
                 },
                 {
@@ -950,8 +1011,12 @@ describe("CoapRequestNode", function () {
             var message = "Got it!";
 
             // let's make a CoAP server to respond to our requests (no matter how silly they are)
-            var server = coap.createServer({"multicastAddress": MULTICAST_ADDR});
-            var server2 = coap.createServer({"multicastAddress": MULTICAST_ADDR});
+            var server = coap.createServer({
+                multicastAddress: MULTICAST_ADDR,
+            });
+            var server2 = coap.createServer({
+                multicastAddress: MULTICAST_ADDR,
+            });
 
             server.on("request", function (req, res) {
                 res.end(message);
