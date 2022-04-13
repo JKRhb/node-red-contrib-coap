@@ -51,6 +51,7 @@
     "cbor"
   ],
   "node-red": {
+    "version": ">=1.3.0",
     "nodes": {
       "coap-in": "coap/coap-in.js",
       "coap-request": "coap/coap-request.js"
