@@ -1,32 +1,51 @@
 [
-    { "type": "tab", "id": "e237f4a1.bd2cd", "label": "Sheet 1" },
     {
-        "id": "a074090c.3d263",
+        "type": "tab",
+        "id": "35e56c01582908f3",
+        "label": "Sheet 1"
+    },
+    {
+        "id": "22b4781dd35417aa",
+        "type": "function",
+        "z": "35e56c01582908f3",
+        "name": "Set payload",
+        "func": "msg.payload = \"Hello there\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 180,
+        "wires": [["5309313d5cc4154d"]]
+    },
+    {
+        "id": "602f9b93480bc935",
+        "type": "coap in",
+        "z": "35e56c01582908f3",
+        "method": "GET",
+        "name": "",
+        "server": "ab3060f4c7e96482",
+        "url": "/hello",
+        "x": 260,
+        "y": 180,
+        "wires": [["22b4781dd35417aa"]]
+    },
+    {
+        "id": "5309313d5cc4154d",
+        "type": "coap response",
+        "z": "35e56c01582908f3",
+        "name": "",
+        "statusCode": "",
+        "contentFormat": "text/plain",
+        "x": 690,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "ab3060f4c7e96482",
         "type": "coap-server",
         "name": "Hello CoAP Server",
         "port": "5683"
-    },
-    {
-        "id": "e7ed27ab.2615",
-        "type": "coap in",
-        "method": "GET",
-        "name": "GET /hello",
-        "server": "a074090c.3d263",
-        "url": "/hello",
-        "x": 360,
-        "y": 58,
-        "z": "e237f4a1.bd2cd",
-        "wires": [["2450fb5a.314804"]]
-    },
-    {
-        "id": "2450fb5a.314804",
-        "type": "function",
-        "name": "Responder",
-        "func": "msg.res.end('Hello there');\nreturn msg;",
-        "outputs": 1,
-        "x": 568,
-        "y": 60,
-        "z": "e237f4a1.bd2cd",
-        "wires": [[]]
     }
 ]
