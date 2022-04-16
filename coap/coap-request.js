@@ -112,7 +112,7 @@ module.exports = function (RED) {
             var payload = _constructPayload(msg, config["content-format"]);
 
             if (config.observe === true) {
-                reqOpts.observe = "1";
+                reqOpts.observe = true;
             } else {
                 delete reqOpts.observe;
             }
