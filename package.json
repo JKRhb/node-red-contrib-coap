@@ -3,17 +3,17 @@
   "version": "0.3.0",
   "description": "CoAP support in Node-RED",
   "dependencies": {
-    "cbor": "^6.0.1",
-    "coap": "^0.24.0",
+    "cbor": "^8.1.0",
+    "coap": "^1.0.5",
     "h5.linkformat": "0.0.0",
     "uri-js": "^4.4.1"
   },
   "devDependencies": {
-    "coveralls": "^3.1.0",
-    "jshint": "^2.12.0",
-    "mocha": "^8.2.1",
-    "node-red": "^1.2.7",
-    "node-red-node-test-helper": "^0.2.5",
+    "coveralls": "^3.1.1",
+    "jshint": "^2.13.4",
+    "mocha": "^9.2.2",
+    "node-red": "^2.2.2",
+    "node-red-node-test-helper": "^0.2.7",
     "nyc": "^15.1.0"
   },
   "scripts": {
