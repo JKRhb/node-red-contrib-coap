@@ -95,7 +95,7 @@ module.exports = function (RED) {
             var payload = _constructPayload(msg, node.options.contentFormat);
 
             if (node.options.observe === true) {
-                reqOpts.observe = "1";
+                reqOpts.observe = "0";
             } else {
                 delete reqOpts.observe;
             }
