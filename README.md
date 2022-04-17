@@ -2,8 +2,6 @@ node-red-contrib-coap
 =====================
 ![Build Status](https://github.com/JKRhb/node-red-contrib-coap/workflows/Build%20Status/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/JKRhb/node-red-contrib-coap/badge.svg?branch=master)](https://coveralls.io/github/JKRhb/node-red-contrib-coap?branch=master)
-[![Dependency Status](https://david-dm.org/JKRhb/node-red-contrib-coap.png)](https://david-dm.org/JKRhb/node-red-contrib-coap)
-[![Dev Dependency Status](https://david-dm.org/JKRhb/node-red-contrib-coap/dev-status.png)](https://david-dm.org/JKRhb/node-red-contrib-coap#dev-badge-embed)
 
 This project adds CoAP support to [Node-RED](http://nodered.org/). It is based on Matteo Collina's [node-coap](https://github.com/mcollina/node-coap).
 
