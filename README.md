@@ -3,8 +3,8 @@
 [![Build Status](https://github.com/JKRhb/node-red-contrib-coap/actions/workflows/npm-test.yml/badge.svg?event=release)](https://github.com/JKRhb/node-red-contrib-coap/actions/workflows/npm-test.yml)
 [![platform](https://img.shields.io/badge/platform-Node--RED-red)](https://flows.nodered.org/node/node-red-contrib-coap)
 [![NPM version](https://badge.fury.io/js/node-red-contrib-coap.svg)](https://www.npmjs.com/package/node-red-contrib-coap)
-[![Coverage Status](https://coveralls.io/repos/github/JKRhb/node-red-contrib-coap/badge.svg?branch=master)](https://coveralls.io/github/JKRhb/node-red-contrib-coap?branch=master)
-[![NPM](https://img.shields.io/npm/l/node-red-contrib-coap)](https://github.com/JKRhb/node-red-contrib-coap/blob/master/LICENSE)
+[![Coverage Status](https://coveralls.io/repos/github/JKRhb/node-red-contrib-coap/badge.svg?branch=main)](https://coveralls.io/github/JKRhb/node-red-contrib-coap?branch=main)
+[![NPM](https://img.shields.io/npm/l/node-red-contrib-coap)](https://github.com/JKRhb/node-red-contrib-coap/blob/main/LICENSE)
 
 This project adds CoAP support to [Node-RED](http://nodered.org/). It is based on Matteo Collina's [node-coap](https://github.com/mcollina/node-coap).
 
