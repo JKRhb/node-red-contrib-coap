@@ -448,6 +448,43 @@ describe("CoapRequestNode", function () {
         });
     });
 
+    it("should use the default CoAP port if no port is provided in the request URL", function (done) {
+        const port = 5683;
+        const flow = [
+            {
+                id: "n1",
+                type: "inject",
+                name: "inject",
+                payload: "",
+                payloadType: "none",
+                repeat: "",
+                crontab: "",
+                once: true,
+                wires: [["n2"]],
+            },
+            {
+                id: "n2",
+                type: "coap request",
+                "content-format": "text/plain",
+                method: "",
+                name: "coapRequest",
+                observe: false,
+                url: "coap://localhost/test-resource",
+            },
+        ];
+
+        const testNodes = [coapRequestNode, injectNode];
+
+        const server = coap.createServer();
+        server.on("request", (req, res) => {
+            req.method.should.equal("GET");
+            done();
+        });
+        helper.load(testNodes, flow, () => {
+            server.listen(port);
+        });
+    });
+
     it("should use msg.url", function (done) {
         var port = getPort();
         var flow = [

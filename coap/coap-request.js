@@ -1,3 +1,5 @@
+const defaultCoapPort = 5683;
+
 module.exports = function (RED) {
     "use strict";
 
@@ -39,14 +41,24 @@ module.exports = function (RED) {
             return hostname;
         }
 
+        function _determinePort(url) {
+            const port = parseInt(url.port);
+            if (isNaN(port)) {
+                return defaultCoapPort;
+            }
+
+            return port;
+        }
+
         function _makeRequest(msg) {
             const url = new URL(config.url || msg.url);
             const hostname = _determineHostname(url);
+            const port = _determinePort(url);
 
             const reqOpts = {
                 hostname,
                 pathname: url.pathname,
-                port: url.port,
+                port,
                 query: url.search.substring(1),
             };
             reqOpts.method = (
