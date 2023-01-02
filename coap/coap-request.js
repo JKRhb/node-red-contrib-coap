@@ -75,6 +75,12 @@ module.exports = function (RED) {
             reqOpts.headers["Content-Format"] = config["content-format"];
             reqOpts.multicast = config.multicast;
             reqOpts.multicastTimeout = config.multicastTimeout;
+            reqOpts.confirmable = msg.confirmable;
+
+            if (reqOpts.confirmable == null) {
+
+                reqOpts.confirmable = config.confirmable;
+            }
 
             function _onResponse(res) {
                 function _send(payload) {

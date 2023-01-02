@@ -21,6 +21,9 @@
         "inputObserve": {
             "label": "Observe?"
         },
+        "inputConfirmable": {
+            "label": "Confirmable?"
+        },
         "inputRawBuffer": {
             "label": "Raw buffer?"
         },
