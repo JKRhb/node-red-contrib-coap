@@ -5,11 +5,7 @@
         defaults: {
             method: {
                 value: "GET",
-                validate: function (v) {
-                    return (
-                        ["", "GET", "PUT", "POST", "DELETE"].indexOf(v) !== -1
-                    );
-                },
+                validate: (v) => ["", "GET", "PUT", "POST", "DELETE", "FETCH", "PATCH", "iPATCH"].includes(v),
             },
             observe: { value: false, required: true },
             multicast: { value: false, required: true },
@@ -51,6 +47,9 @@
             <option value="PUT">PUT</option>
             <option value="POST">POST</option>
             <option value="DELETE">DELETE</option>
+            <option value="FETCH">FETCH</option>
+            <option value="PATCH">PATCH</option>
+            <option value="iPATCH">iPATCH</option>
         </select>
     </div>
     <div class="form-row">

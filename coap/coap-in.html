@@ -59,6 +59,9 @@
             <option value="POST">POST</option>
             <option value="PUT">PUT</option>
             <option value="DELETE">DELETE</option>
+            <option value="FETCH">FETCH</option>
+            <option value="PATCH">PATCH</option>
+            <option value="iPATCH">iPATCH</option>
         </select>
     </div>
     <div class="form-row">
@@ -78,11 +81,7 @@
             method: {
                 value: "GET",
                 required: true,
-                validate: function (v) {
-                    return (
-                        v == "GET" || v == "PUT" || v == "POST" || v == "DELETE"
-                    );
-                },
+                validate: (v) => ["GET", "PUT", "POST", "DELETE", "FETCH", "PATCH", "iPATCH"].includes(v),
             },
             name: { value: "" },
             server: { type: "coap-server", required: true },
