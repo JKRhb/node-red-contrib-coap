@@ -171,7 +171,7 @@ module.exports = function (RED) {
             var payload;
 
             if (reqOpts.method !== "GET") {
-                payload = _constructPayload(msg, reqOpts.headers["Content-Format"]);
+                payload = _constructPayload(msg, reqOpts.headers["content-Format"]);
             } else if (paytoqs === "query") {
                 try {
                     _appendQueryParams(reqOpts, msg.payload);
