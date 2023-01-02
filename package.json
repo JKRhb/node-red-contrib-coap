@@ -29,7 +29,7 @@
     "reporter": "spec"
   },
   "jshintConfig": {
-    "esversion": 6,
+    "esversion": 11,
     "curly": true,
     "forin": true,
     "immed": true,
