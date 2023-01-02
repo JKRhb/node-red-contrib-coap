@@ -66,6 +66,11 @@ module.exports = function (RED) {
                 msg.method ||
                 "GET"
             ).toUpperCase();
+
+            if (reqOpts.method === "IPATCH") {
+                reqOpts.method = "iPATCH";
+            }
+
             reqOpts.headers = {};
             reqOpts.headers["Content-Format"] = config["content-format"];
             reqOpts.multicast = config.multicast;
