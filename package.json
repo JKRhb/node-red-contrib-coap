@@ -3,7 +3,7 @@
   "version": "0.8.0",
   "description": "CoAP support in Node-RED",
   "dependencies": {
-    "cbor": "^8.1.0",
+    "cbor": "^9.0.0",
     "coap": "^1.0.5",
     "h5.linkformat": "0.0.0"
   },
