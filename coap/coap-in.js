@@ -165,7 +165,7 @@ module.exports = function (RED) {
 
         node.options = {
             name: config.name,
-            code: config.code,
+            code: config.statusCode,
             contentFormat: config.contentFormat
         };
 
