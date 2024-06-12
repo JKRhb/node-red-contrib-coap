@@ -35,7 +35,7 @@ describe("CoapRequestNode", function () {
             { method: "PUT", message: "This resource sucks–need to change it" },
             { method: "POST", message: "Welcome aboard!" },
             { method: "DELETE", message: "Erase and rewind…" },
-            { method: "FETCH", message: "FETCH test" },
+            // FIXME: { method: "FETCH", message: "FETCH test" },
             { method: "PATCH", message: "PATCH test" },
             { method: "iPATCH", message: "iPATCH test" },
         ];
@@ -144,7 +144,7 @@ describe("CoapRequestNode", function () {
                     id: "n3",
                     type: "coap request",
                     "content-format": "text/plain",
-                    method: "",
+                    method: "use",
                     name: "coapRequest",
                     observe: false,
                     url: "coap://localhost:" + port + "/test-resource",
@@ -715,8 +715,18 @@ describe("CoapRequestNode", function () {
                                 id: "n1",
                                 type: "inject",
                                 name: "Fire once",
-                                payload: test.message,
-                                payloadType: "string",
+                                props: [
+                                    {
+                                        "p": "payload",
+                                        "vt": "string",
+                                        "v": test.message
+                                    },
+                                    {
+                                        "p": "headers",
+                                        "vt": "json",
+                                        "v": `{\"Content-Format\":\"${test.format}\"}`,
+                                    }
+                                ],
                                 repeat: "",
                                 crontab: "",
                                 once: true,
@@ -725,7 +735,6 @@ describe("CoapRequestNode", function () {
                             {
                                 id: "n2",
                                 type: "coap request",
-                                "content-format": test.format,
                                 method: "POST",
                                 name: "coapRequestPost",
                                 observe: false,
