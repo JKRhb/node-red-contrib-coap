@@ -77,6 +77,10 @@ module.exports = function (RED) {
             reqOpts.multicastTimeout = config.multicastTimeout;
             reqOpts.confirmable = msg.confirmable ?? config.confirmable ?? true;
 
+            if (config.useIPv6Agent === true) {
+                reqOpts.agent = coap.globalAgentIPv6;
+            }
+
             function _onResponse(res) {
                 function _send(payload) {
                     node.send(
