@@ -15,6 +15,11 @@ module.exports = function (RED) {
 
         node._inputNodes = []; // collection of "coap in" nodes that represent coap resources
 
+        /**
+         * Resource list for /.well-known/core
+         */
+        node._resourceList = [];
+
         // Setup node-coap server and start
         const serverSettings = {};
         if (config.ipv6) {
@@ -22,6 +27,7 @@ module.exports = function (RED) {
         } else {
             serverSettings.type = "udp4";
         }
+        node._supportWellKnownCore = config.wellknowncore ?? false;
         node.server = new coap.createServer(serverSettings);
         node.server.on("request", function (req, res) {
             node.handleRequest(req, res);
@@ -62,6 +68,14 @@ module.exports = function (RED) {
         }
     };
 
+    CoapServerNode.prototype._handleWellKnownCore = function (res) {
+        // TODO: Expand capabilities of the handler for /.well-known/core
+        res.code = "2.05";
+        res.setOption("Content-Format", "application/link-format");
+        const payload = this._resourceList.map((resource) => `<${resource}>`).join(",")
+        return res.end(payload);
+    }
+
     function _getPayload(inNode, rawBuffer, payload, contentFormat) {
         if (rawBuffer) {
             return payload;
@@ -94,7 +108,10 @@ module.exports = function (RED) {
     }
 
     CoapServerNode.prototype.handleRequest = function (req, res) {
-        //TODO: Check if there are any matching resource. If the resource is .well-known return the resource directory to the client
+        if (this._supportWellKnownCore && req.url == "/.well-known/core" && req.method == "GET") {
+            return this._handleWellKnownCore(res);
+        }
+
         const node = this;
         let matchResource = false;
         let matchMethod = false;
