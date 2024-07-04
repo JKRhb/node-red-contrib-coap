@@ -171,7 +171,7 @@ module.exports = function (RED) {
             var payload;
 
             if (reqOpts.method !== "GET") {
-                reqOpts.headers["Content-Format"] ??= config["content-format"]
+                reqOpts.headers["Content-Format"] ??= config["content-format"]; // jshint ignore:line
                 payload = _constructPayload(msg, reqOpts.headers["Content-Format"]);
             } else if (paytoqs === "query") {
                 try {
