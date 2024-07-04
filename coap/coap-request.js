@@ -11,11 +11,38 @@ module.exports = function (RED) {
         RED.nodes.createNode(this, config);
         var node = this;
 
+        var paytoqs = config.paytoqs || "ignore";
+
+        function _stringifyParams(params) {
+            var paramList = [];
+            for (var [key, value] of Object.entries(params)) {
+                var dataType = typeof value;
+                if (["string", "number"].includes(dataType)) {
+                    paramList.push(`${key}=${value}`);
+                }
+            }
+
+            return paramList.join("&");
+        }
+
+        function _appendQueryParams(reqOpts, payload) {
+            if (typeof payload === "object") {
+                var newParams = _stringifyParams(payload);
+                if (newParams && reqOpts.query !== "") {
+                    newParams = "&" + newParams;
+                }
+
+                reqOpts.query = reqOpts.query + newParams;
+            } else {
+                throw new Error("Hallo");
+            }
+        }
+
         function _constructPayload(msg, contentFormat) {
-            var payload = null;
+            let payload = null;
 
             if (contentFormat === "text/plain") {
-                payload = msg.payload;
+                payload = msg.payload.toString();
             } else if (contentFormat === "application/json") {
                 payload = JSON.stringify(msg.payload);
             } else if (contentFormat === "application/cbor") {
@@ -61,24 +88,26 @@ module.exports = function (RED) {
                 port,
                 query: url.search.substring(1),
             };
-            reqOpts.method = (
-                config.method ||
-                msg.method ||
-                "GET"
-            ).toUpperCase();
+            reqOpts.method = config.method.toUpperCase() ?? "GET";
+
+            if (config.method === "use" && msg.method != null) {
+                reqOpts.method = msg.method.toUpperCase();
+            }
 
             if (reqOpts.method === "IPATCH") {
                 reqOpts.method = "iPATCH";
             }
 
-            reqOpts.headers = {};
-            reqOpts.headers["Content-Format"] = config["content-format"];
+            reqOpts.headers = msg.headers ?? {};
             reqOpts.multicast = config.multicast;
             reqOpts.multicastTimeout = config.multicastTimeout;
             reqOpts.confirmable = msg.confirmable ?? config.confirmable ?? true;
 
             function _onResponse(res) {
                 function _send(payload) {
+                    if (!reqOpts.observe) {
+                        node.status({});
+                    }
                     node.send(
                         Object.assign({}, msg, {
                             payload: payload,
@@ -89,31 +118,38 @@ module.exports = function (RED) {
                 }
 
                 function _onResponseData(data) {
-                    if (config["raw-buffer"]) {
+                    var contentFormat = res.headers["Content-Format"];
+                    var configContentFormat = config["content-format"];
+
+                    if (config["raw-buffer"] === true || configContentFormat === "raw-buffer") {
                         _send(data);
-                    } else if (res.headers["Content-Format"] === "text/plain") {
+                    } else if (contentFormat === "text/plain" || configContentFormat === "text/plain") {
                         _send(data.toString());
-                    } else if (
-                        res.headers["Content-Format"] === "application/json"
-                    ) {
+                    } else if (contentFormat.startsWith("application/") && contentFormat.includes("json")) {
                         try {
                             _send(JSON.parse(data.toString()));
                         } catch (error) {
+                            node.status({
+                                fill: "red",
+                                shape: "ring",
+                                text: error.message,
+                            });
                             node.error(error.message);
                         }
-                    } else if (
-                        res.headers["Content-Format"] === "application/cbor"
-                    ) {
-                        cbor.decodeAll(data, function (err, data) {
-                            if (err) {
+                    } else if (contentFormat.startsWith("application/") && contentFormat.includes("cbor")) {
+                        cbor.decodeAll(data, function (error, data) {
+                            if (error) {
+                                node.error(error.message);
+                                node.status({
+                                    fill: "red",
+                                    shape: "ring",
+                                    text: error.message,
+                                });
                                 return false;
                             }
                             _send(data[0]);
                         });
-                    } else if (
-                        res.headers["Content-Format"] ===
-                        "application/link-format"
-                    ) {
+                    } else if (contentFormat === "application/link-format") {
                         _send(linkFormat.parse(data.toString()));
                     } else {
                         _send(data.toString());
@@ -122,12 +158,29 @@ module.exports = function (RED) {
 
                 res.on("data", _onResponseData);
 
-                if (reqOpts.observe) {
+                if (reqOpts.observe === true) {
+                    node.status({
+                        fill: "blue",
+                        shape: "dot",
+                        text: "coapRequest.status.observing",
+                    });
                     node.stream = res;
                 }
             }
 
-            var payload = _constructPayload(msg, config["content-format"]);
+            var payload;
+
+            if (reqOpts.method !== "GET") {
+                reqOpts.headers["Content-Format"] ??= config["content-format"]; // jshint ignore:line
+                payload = _constructPayload(msg, reqOpts.headers["Content-Format"]);
+            } else if (paytoqs === "query") {
+                try {
+                    _appendQueryParams(reqOpts, msg.payload);
+                } catch (error) {
+                    node.error("Coap request: Invalid payload format!");
+                    return;
+                }
+            }
 
             if (config.observe === true) {
                 reqOpts.observe = true;
@@ -135,26 +188,40 @@ module.exports = function (RED) {
                 delete reqOpts.observe;
             }
 
-            //TODO: should revisit this block
+            // TODO: should revisit this block
             if (node.stream) {
                 node.stream.close();
             }
 
             var req = coap.request(reqOpts);
             req.on("response", _onResponse);
-            req.on("error", function (err) {
+            req.on("error", function (error) {
+                node.status({
+                    fill: "red",
+                    shape: "ring",
+                    text: error.message,
+                });
                 node.log("client error");
-                node.log(err);
+                node.log(error.message);
             });
 
-            if (payload) {
+            if (payload != null) {
                 req.write(payload);
             }
             req.end();
         }
 
         this.on("input", function (msg) {
+            node.status({
+                fill: "blue",
+                shape: "dot",
+                text: "coapRequest.status.requesting",
+            });
             _makeRequest(msg);
+        });
+
+        this.on("close", function () {
+            node.status({});
         });
     }
     RED.nodes.registerType("coap request", CoapRequestNode);
