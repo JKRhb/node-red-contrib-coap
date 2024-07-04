@@ -72,9 +72,9 @@ module.exports = function (RED) {
         // TODO: Expand capabilities of the handler for /.well-known/core
         res.code = "2.05";
         res.setOption("Content-Format", "application/link-format");
-        const payload = this._resourceList.map((resource) => `<${resource}>`).join(",")
+        const payload = this._resourceList.map((resource) => `<${resource}>`).join(",");
         return res.end(payload);
-    }
+    };
 
     function _getPayload(inNode, rawBuffer, payload, contentFormat) {
         if (rawBuffer) {
