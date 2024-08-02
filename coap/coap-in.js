@@ -66,7 +66,7 @@ module.exports = function (RED) {
         if (rawBuffer) {
             return payload;
         } else if (_checkContentFormat(contentFormat, "text/plain")) {
-            return payload.toString();
+            return payload;
         } else if (_checkContentFormat(contentFormat, "json")) {
             return JSON.parse(payload.toString());
         } else if (_checkContentFormat(contentFormat, "cbor")) {
@@ -79,7 +79,7 @@ module.exports = function (RED) {
         } else if (_checkContentFormat(contentFormat, "application/link-format")) {
             return linkFormat.parse(payload.toString());
         } else {
-            return payload.toString();
+            return payload;
         }
     }
 
@@ -149,13 +149,13 @@ module.exports = function (RED) {
         }
 
         if (_checkContentFormat(contentFormat, "text/plain")) {
-            return msg.payload.toString();
+            return msg.payload;
         } else if (_checkContentFormat(contentFormat, "json")) {
             return JSON.stringify(msg.payload);
         } else if (_checkContentFormat(contentFormat, "cbor")) {
             return cbor.encode(msg.payload);
         } else {
-            return msg.payload.toString();
+            return msg.payload;
         }
     }
 
