@@ -149,7 +149,7 @@ module.exports = function (RED) {
         }
 
         if (_checkContentFormat(contentFormat, "text/plain")) {
-            return msg.payload.toString();
+            return msg.payload;
         } else if (_checkContentFormat(contentFormat, "json")) {
             return JSON.stringify(msg.payload);
         } else if (_checkContentFormat(contentFormat, "cbor")) {
