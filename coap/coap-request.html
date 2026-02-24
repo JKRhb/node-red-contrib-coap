@@ -8,6 +8,7 @@
                 validate: (v) => ["", "GET", "PUT", "POST", "DELETE", "FETCH", "PATCH", "iPATCH"].includes(v),
             },
             confirmable: { value: true, required: true },
+            useIPv6Agent: { value: false, required: true },
             observe: { value: false, required: true },
             multicast: { value: false, required: true },
             multicastTimeout: { value: 20000, required: false },
@@ -59,6 +60,10 @@
         <label for="node-input-confirmable" style="width: auto" data-i18n="coapRequest.inputConfirmable.label"></label>
     </div>
 
+    <div class="form-row">
+        <input type="checkbox" id="node-input-useIPv6Agent" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-input-useIPv6Agent" style="width: auto" data-i18n="coapRequest.inputIPv6.label"></label>
+    </div>
     <div class="form-row">
         <input type="checkbox" id="node-input-observe" style="display: inline-block; width: auto; vertical-align: top;">
         <label for="node-input-observe" style="width: auto" data-i18n="coapRequest.inputObserve.label"></label>
