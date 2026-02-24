@@ -144,7 +144,7 @@ describe("CoapRequestNode", function () {
                     id: "n3",
                     type: "coap request",
                     "content-format": "text/plain",
-                    method: "",
+                    method: "use",
                     name: "coapRequest",
                     observe: false,
                     url: "coap://localhost:" + port + "/test-resource",
@@ -715,8 +715,18 @@ describe("CoapRequestNode", function () {
                                 id: "n1",
                                 type: "inject",
                                 name: "Fire once",
-                                payload: test.message,
-                                payloadType: "string",
+                                props: [
+                                    {
+                                        "p": "payload",
+                                        "vt": "string",
+                                        "v": test.message
+                                    },
+                                    {
+                                        "p": "headers",
+                                        "vt": "json",
+                                        "v": `{\"Content-Format\":\"${test.format}\"}`,
+                                    }
+                                ],
                                 repeat: "",
                                 crontab: "",
                                 once: true,
@@ -725,7 +735,6 @@ describe("CoapRequestNode", function () {
                             {
                                 id: "n2",
                                 type: "coap request",
-                                "content-format": test.format,
                                 method: "POST",
                                 name: "coapRequestPost",
                                 observe: false,
