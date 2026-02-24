@@ -65,8 +65,6 @@ module.exports = function (RED) {
     function _getPayload(inNode, rawBuffer, payload, contentFormat) {
         if (rawBuffer) {
             return payload;
-        } else if (_checkContentFormat(contentFormat, "text/plain")) {
-            return payload.toString();
         } else if (_checkContentFormat(contentFormat, "json")) {
             return JSON.parse(payload.toString());
         } else if (_checkContentFormat(contentFormat, "cbor")) {
@@ -79,7 +77,7 @@ module.exports = function (RED) {
         } else if (_checkContentFormat(contentFormat, "application/link-format")) {
             return linkFormat.parse(payload.toString());
         } else {
-            return payload.toString();
+            return payload;
         }
     }
 
@@ -142,20 +140,12 @@ module.exports = function (RED) {
     RED.nodes.registerType("coap in", CoapInNode);
 
     function _constructPayload(msg, contentFormat) {
-        const payload = msg.payload;
-
-        if (payload == null) {
-            return null;
-        }
-
-        if (_checkContentFormat(contentFormat, "text/plain")) {
-            return msg.payload.toString();
-        } else if (_checkContentFormat(contentFormat, "json")) {
+        if (_checkContentFormat(contentFormat, "json")) {
             return JSON.stringify(msg.payload);
         } else if (_checkContentFormat(contentFormat, "cbor")) {
             return cbor.encode(msg.payload);
         } else {
-            return msg.payload.toString();
+            return msg.payload;
         }
     }
 
