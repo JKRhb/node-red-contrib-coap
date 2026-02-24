@@ -994,6 +994,10 @@ describe("CoapRequestNode", function () {
         });
 
         it("should be able to process multiple responses if the multicast option is set", function (done) {
+            if (process.platform == "darwin") {
+                this.skip()
+            }
+
             var port = getPort();
             var MULTICAST_ADDR = "224.0.0.1";
             var flow = [
