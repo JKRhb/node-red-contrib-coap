@@ -13,7 +13,7 @@
     "mocha": "^11.0.1",
     "node-red": "^4.0.2",
     "node-red-node-test-helper": "^0.3.0",
-    "nyc": "^17.0.0"
+    "nyc": "^18.0.0"
   },
   "scripts": {
     "test": "nyc mocha --exit",
